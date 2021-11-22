@@ -121,14 +121,25 @@ socket.on('connect', () => {
         case 'set':
           info(`set ${argv.key} =>`)
 
-          socket.emit('set', argv.key, argv.value, (error) => {
-            if (error) {
-              console.error(error)
-            } else {
-              console.info('OK')
-            }
-            end()
-          })
+          if (argv.timestamp) {
+            socket.emit('set', argv.key, { value: argv.value, date: argv.timestamp }, (error) => {
+              if (error) {
+                console.error(error)
+              } else {
+                console.info('OK')
+              }
+              end()
+            })
+          } else {
+            socket.emit('set', argv.key, argv.value, (error) => {
+              if (error) {
+                console.error(error)
+              } else {
+                console.info('OK')
+              }
+              end()
+            })
+          }
           break
         case 'keys':
           info('keys =>')
@@ -139,6 +150,15 @@ socket.on('connect', () => {
             } else {
               console.info(keys.join(','))
             }
+            end()
+          })
+          break
+        case 'keysAndTime':
+          if (!argv.bot) {
+            console.info('keysAndTime =>')
+          }
+          socket.emit('keysAndTime', (keys) => {
+            console.info(keys)
             end()
           })
           break

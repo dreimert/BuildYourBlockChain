@@ -2,12 +2,12 @@ import fs from 'fs'
 import { spawn } from 'child_process'
 import { io } from 'socket.io-client'
 
-const promiseTimeout = function (ms, promise) {
+const promiseTimeout = function (name, ms, promise) {
   // Create a promise that rejects in <ms> milliseconds
   const timeout = new Promise((resolve, reject) => {
     const id = setTimeout(() => {
       clearTimeout(id)
-      reject(new Error('Timed out in ' + ms + 'ms.'))
+      reject(new Error(`${name}: Timed out in ${ms} ms.`))
     }, ms)
   })
 
@@ -73,7 +73,7 @@ export function parseTopology (topology) {
   })
 }
 
-export function runNetwork (topology, port = 7000, verbose = true, timeout = 5000) {
+export function runNetwork (topology, port = 7000, verbose = true, timeout = 15000) {
   const newNodes = []
 
   topology.forEach((connexion) => {
@@ -98,17 +98,18 @@ export function setNeighbor (src, dst, verbose = true, timeout = 5000) {
     console.info(`Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`)
   }
 
-  return promiseTimeout(timeout, new Promise((resolve, reject) => {
+  return promiseTimeout(`Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`, timeout, new Promise((resolve, reject) => {
     const socket = io(`http://localhost:${src.port}`, {
       path: '/byc',
-      timeout: timeout,
-      reconnection: false,
-      requestTimeout: timeout
+      timeout: 1000,
+      reconnection: true,
+      requestTimeout: 1000
     })
 
     socket.on('connect', () => {
       socket.emit('addPeer', dst.port, (error) => {
         if (error) {
+          console.error('setNeighbor::addPeer:error:', error)
           reject(error)
         } else {
           resolve()
@@ -131,10 +132,11 @@ export function auth (target, neighbor, verbose = true, timeout = 5000) {
     requestTimeout: timeout
   })
 
-  return promiseTimeout(timeout, new Promise((resolve, reject) => {
+  return promiseTimeout('auth', timeout, new Promise((resolve, reject) => {
     socket.on('connect', () => {
       socket.emit('auth', neighbor.port, (error, value) => {
         if (error) {
+          console.error('auth::auth:error:', error)
           reject(error)
         } else {
           resolve()
@@ -154,6 +156,7 @@ export function killall () {
 }
 
 export default {
+  network,
   wait,
   run,
   parseTopology,
