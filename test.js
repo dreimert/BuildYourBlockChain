@@ -1,0 +1,146 @@
+import tape from 'tape'
+import net from 'net'
+import fs from 'fs'
+
+import { exec, spawn } from 'child_process'
+
+function execCommande (cmd, t) {
+  return new Promise((resolve, reject) => {
+    exec(cmd, (error, stdout, stderr) => {
+      if (error) {
+        t.error(error)
+        if (error.code === 126) {
+          t.comment('Avez-vous fait un `chmod +x serveur.js` ?')
+        }
+        t.end()
+        return reject(error)
+      }
+      return resolve({ stdout, stderr })
+    })
+  })
+}
+
+tape('Vérification de la version de node', function (t) {
+  execCommande('node --version', t).then(({ stdout, stderr }) => {
+    t.ok(parseInt(stdout.split('.')[0].split('v')[1]) >= 16, 'Version de node supérieure ou équale à 16')
+    t.end()
+  })
+})
+
+tape('Vérification de la version', function (t) {
+  execCommande('node ./serveur.js --version', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, '1.0.0\n', 'Numero de version')
+    t.end()
+  })
+})
+
+function isPortTaken (port) {
+  return new Promise((resolve, reject) => {
+    const tester = net.createServer()
+      .once('error', err => (err.code === 'EADDRINUSE' ? resolve(false) : reject(err)))
+      .once('listening', () => tester.once('close', () => resolve(true)).close())
+      .listen(port)
+  })
+}
+
+let serveur
+
+tape('Démarrage du serveur sur le port 3000', function (t) {
+  isPortTaken(3000).then((ok) => {
+    t.ok(ok, 'Port disponible')
+    if (!ok) {
+      t.comment("Avez-vous bien arrêté tous les serveurs en cours d'exécution ?")
+    }
+  }).then(() => {
+    const out = fs.openSync('./serveur.log', 'a')
+    const err = fs.openSync('./serveur.err', 'a')
+
+    serveur = spawn('node', ['./serveur.js', '--port=3000'], {
+      stdio: ['ignore', out, err]
+    })
+
+    t.end()
+  })
+})
+
+tape('Affectation de la valeur "Reimert" à la clef "name"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true set name Reimert', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'OK\n', 'Set réussi')
+    t.end()
+  })
+})
+
+tape('Récupération de la valeur associé à la clef "name"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true get name', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'Reimert\n', 'Valeur correct')
+    t.end()
+  })
+})
+
+tape('Récupération de la valeur associé à la clef "jeNeSuisPasDef"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true get jeNeSuisPasDef', t).then(({ stdout, stderr }) => {
+    t.equal(stderr, 'Field jeNeSuisPasDef not exists\n', 'Retour une erreur')
+    t.end()
+  })
+})
+
+tape('Affectation de la valeur "Frenot" à la clef "name"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true set name Frenot', t).then(({ stdout, stderr }) => {
+    t.equal(stderr, 'set error : Field name exists.\n', 'Set doit échouer car la valeur change')
+    t.end()
+  })
+})
+
+tape('Récupération de la valeur associé à la clef "name"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true get name', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'Reimert\n', 'Valeur correct')
+    t.end()
+  })
+})
+
+tape('Réaffectation de la valeur "Reimert" à la clef "name"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true set name Reimert', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'OK\n', 'Set doit réussir car la valeur ne change pas. Cf. protocole.')
+    t.end()
+  })
+})
+
+tape('Récupération de la valeur associé à la clef "name"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true get name', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'Reimert\n', 'Valeur correct')
+    t.end()
+  })
+})
+
+tape('Récupération de la list des clefs', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true keys', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'name\n', 'Valeur correct')
+    t.end()
+  })
+})
+
+tape('Affectation de la valeur "Frenot" à la clef "directeur"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true set directeur Frenot', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'OK\n', 'Set doit réussir')
+    t.end()
+  })
+})
+
+tape('Récupération de la valeur associé à la clef "directeur"', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true get directeur', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'Frenot\n', 'Valeur correct')
+    t.end()
+  })
+})
+
+tape('Récupération de la list des clefs', function (t) {
+  execCommande('node ./cli.js --port=3000 --bot=true keys', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'name,directeur\n', 'Valeur correct')
+    t.end()
+  })
+})
+
+tape('Kill serveur', function (t) {
+  t.ok(serveur.kill(), 'Arret du serveur')
+  t.end()
+})
