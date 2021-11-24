@@ -52,13 +52,17 @@ const neighbors = [];
 
 Pour vérifier que la commande fonctionne, vous pouvez initialer le tableau avec des valeurs : `const neighbors = ['a', 'b', 'c'];`.
 
-#### Ajoutez une commande `addPeer` à votre noeud. Dans un premier temps, faites en sorte que cette commande ajoute le port à la liste des voisins.
+#### Ajoutez une commande `addPeer` à votre noeud. Dans un premier temps, faites en sorte que cette commande ajoute le port à la liste des voisins s'il n'y ai pas déjà.
+
+##### Indice 1 :
 
 ```Javascript
 const maVariable = 42;
 myArray.push(maVariable);
 // La fonction push ajoute 'maVariable' à la fin du tableau
 ```
+
+##### Indice 2 : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/includes
 
 #### Vérifiez le bon fonctionnement avec la commande `peers`.
 
@@ -78,7 +82,7 @@ const socket = ioClient(`http://localhost:${port}`, {
 });
 ```
 
-Quand la connexion est établie, l'événement `connect` est émit. Vous pouvez observer le *CLI* pour avoir un exemple.
+Quand la connexion est établie, l'événement `connect` est émit. Vous pouvez observer le code du *CLI* pour avoir un exemple.
 
 #### Modifiez la commande `addPeer` de votre noeud pour qu'elle crée une nouvelle connexion.
 
@@ -86,13 +90,15 @@ Est-ce que le noeud ajouté indique bien une nouvelle connexion ? Oui ? Cool ! P
 
 #### Modifiez la commande `addPeer` pour qu'elle envoie une commande `auth` après la connexion.
 
-##### Indice : Il faut attendre la connexion pour émettre le `addPeer`.
+##### Indice 1 : il faut attendre la connexion pour émettre le `addPeer`.
+
+##### Indice 2 : pour émettre une commande, regardez comment le *CLI* fait.
 
 ## Appariement et synchronisation
 
-Nos noeuds maintenant échanger des informations. Vous allez essayer de mettre en place 3 noeuds qui communiquent entre eux et se synchronisent. Par exemple, supposons que vous utilisez les ports 3000, 3001 et 3002.
+Nos noeuds doivent maintenant échanger des informations. Vous allez essayer de mettre en place 3 noeuds qui communiquent entre eux et se synchronisent. Par exemple, supposons que vous utilisez les ports 3000, 3001 et 3002.
 
-Si vous avez respecter les consignes jusqu'à maintenant, votre noeud est connecté aux autres. Il faut maintenant mettre à jour les autres quand lui-même est modifié.
+Si vous avez respecter les consignes jusque là, votre noeud est connecté aux autres. Il faut maintenant mettre à jour les autres quand lui-même est modifié.
 
 Pour commencer, il faut stocker les sockets pour pouvoir écrire à nos contacts.
 
@@ -124,7 +130,9 @@ monTableau.forEach((element, index) => {
 
 Vous avez réussi ? `set` une valeur sur un des noeuds met automatiquement à jour les autres ? Cool !
 
-Imaginez trois amis qui essayent de maintenir une connaissance commune du statut relationnel de leurs connaissances. Réfléchissez maintenant à tous les problèmes qui peuvent arriver. Que se passe-t'il si un des amis est malade ou n'a plus de connexion réseau ? Si deux amis reçoivent en même temps des informations différentes pour une même personne ? Combien de temps avant de se synchroniser ?
+### Commérages
+
+Imaginez trois amis qui essayent de maintenir une connaissance commune du statut relationnel de leurs connaissances. Réfléchissez maintenant à tous les problèmes qui peuvent arriver. Que se passe-t'il si un des amis est malade ou n'a plus de connexion réseau ? Si deux amis reçoivent en même temps des informations différentes pour une même personne ? Combien de temps avant de se synchroniser ? Comment se synchroniser ?
 
 #### Prenez le temps d'y réfléchir.
 
@@ -132,11 +140,13 @@ Nous verrons comment résoudre ces difficultés à l'étape suivant.
 
 ## Synchronisation initiale
 
-Lancez deux noeuds et connectez les. Ajoutez quelles valeurs. Lancez maintenant un troisième noeud et connectez le aux deux autres.
+Lancez deux noeuds et connectez les. Ajoutez quelques valeurs. Lancez maintenant un troisième noeud et connectez le aux deux autres.
 
 #### Demander au troisième noeud une valeur définie avant son lancement. Quel est le problème ?
 
-# Modifier la commande `auth` et `addPeer` pour qu'à chaque nouvelle connexion entre serveur, une requête `keys` soit envoyée et les couples clé / valeur inconnues ajoutées.
+#### Écrire une **fonction** `sync` qui prend en paramètre une *socket*. Elle envoie une requête `keys` et ajoute les couples clé / valeur inconnues.
+
+#### Modifier la commande `auth` et `addPeer` pour qu'à chaque nouvelle connexion entre serveur, la **fonction** `sync` soit appelée.
 
 ## Réseauter
 
@@ -159,6 +169,8 @@ Vous avez pu remarquer un dossier `tools` et un `tools.js` apparaitre à cette �
 ```
 
 Les logs et les erreurs sont redirigés dans des fichiers de la forme `id.log` et `id.err` du dossier `logs`. Vous pouvez les afficher en temps réel avec `tail -f logs/id.log`.
+
+Grace à cet outil, j'ai écris le scénario de la synchronisation initiale. Il est dans `scenarios/sync.js`. Pour l'exécuter : `node scenarios/sync.js`.
 
 ## Vérifier que tout fonctionne
 

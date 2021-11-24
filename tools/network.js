@@ -2,12 +2,12 @@ import fs from 'fs'
 import { spawn } from 'child_process'
 import { io } from 'socket.io-client'
 
-const promiseTimeout = function (ms, promise) {
+const promiseTimeout = function (name, ms, promise) {
   // Create a promise that rejects in <ms> milliseconds
   const timeout = new Promise((resolve, reject) => {
     const id = setTimeout(() => {
       clearTimeout(id)
-      reject(new Error('Timed out in ' + ms + 'ms.'))
+      reject(new Error(`${name}: Timed out in ${ms} ms.`))
     }, ms)
   })
 
@@ -22,7 +22,7 @@ export function wait (ms, verbose = true) {
   return () => {
     return new Promise((resolve) => {
       if (verbose) {
-        console.info(`On attend ${ms} ms`)
+        console.info(`# On attend ${ms} ms`)
       }
       setTimeout(resolve, ms)
     })
@@ -36,20 +36,36 @@ export function run (id, port, verbose = true) {
     fs.mkdirSync('./logs')
   }
 
-  const out = fs.openSync(`./logs/${id}.log`, 'a')
-  const err = fs.openSync(`./logs/${id}.err`, 'a')
+  const out = fs.createWriteStream(`./logs/${id}.log`)
+  const err = fs.createWriteStream(`./logs/${id}.err`)
 
   if (verbose) {
-    console.info(`Lancement de ${id} sur le port ${port}`)
+    console.info(`# Lancement de ${id} sur le port ${port}`)
   }
 
   network[id] = {
     process: spawn('node', ['./serveur.js', `--port=${port}`], {
-      stdio: ['ignore', out, err]
+      stdio: ['ignore', 'pipe', 'pipe']
     }),
     port,
-    id
+    id,
+    out,
+    err
   }
+
+  network[id].process.stdout.on('data', (data) => {
+    if (verbose) {
+      data.toString().split('\n').filter(i => i).map((d) => process.stdout.write(`${id} -> ${d}\n`))
+    }
+    out.write(data)
+  })
+
+  network[id].process.stderr.on('data', (data) => {
+    if (verbose) {
+      data.toString().split('\n').filter(i => i).map((d) => process.stderr.write(`${id} -> ${d}\n`))
+    }
+    err.write(data)
+  })
 
   const onError = new Promise((resolve, reject) => {
     network[id].process.on('exit', (err) => {
@@ -73,7 +89,7 @@ export function parseTopology (topology) {
   })
 }
 
-export function runNetwork (topology, port = 7000, verbose = true, timeout = 5000) {
+export function runNetwork (topology, port = 7000, verbose = true, timeout = 15000) {
   const newNodes = []
 
   topology.forEach((connexion) => {
@@ -95,20 +111,21 @@ export function runNetwork (topology, port = 7000, verbose = true, timeout = 500
 
 export function setNeighbor (src, dst, verbose = true, timeout = 5000) {
   if (verbose) {
-    console.info(`Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`)
+    console.info(`# Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`)
   }
 
-  return promiseTimeout(timeout, new Promise((resolve, reject) => {
+  return promiseTimeout(`Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`, timeout, new Promise((resolve, reject) => {
     const socket = io(`http://localhost:${src.port}`, {
       path: '/byc',
-      timeout: timeout,
-      reconnection: false,
-      requestTimeout: timeout
+      timeout: 1000,
+      reconnection: true,
+      requestTimeout: 1000
     })
 
     socket.on('connect', () => {
       socket.emit('addPeer', dst.port, (error) => {
         if (error) {
+          console.error('#! setNeighbor::addPeer:error:', error)
           reject(error)
         } else {
           resolve()
@@ -121,7 +138,7 @@ export function setNeighbor (src, dst, verbose = true, timeout = 5000) {
 
 export function auth (target, neighbor, verbose = true, timeout = 5000) {
   if (verbose) {
-    console.info(`Ajout de ${neighbor.id} dans la liste des voisin de ${target.id}`)
+    console.info(`# Ajout de ${neighbor.id} dans la liste des voisin de ${target.id}`)
   }
 
   const socket = io(`http://localhost:${target.port}`, {
@@ -131,10 +148,11 @@ export function auth (target, neighbor, verbose = true, timeout = 5000) {
     requestTimeout: timeout
   })
 
-  return promiseTimeout(timeout, new Promise((resolve, reject) => {
+  return promiseTimeout('auth', timeout, new Promise((resolve, reject) => {
     socket.on('connect', () => {
       socket.emit('auth', neighbor.port, (error, value) => {
         if (error) {
+          console.error('#! auth::auth:error:', error)
           reject(error)
         } else {
           resolve()
@@ -154,6 +172,7 @@ export function killall () {
 }
 
 export default {
+  network,
   wait,
   run,
   parseTopology,

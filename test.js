@@ -1,26 +1,10 @@
 import tape from 'tape'
 import _test from 'tape-promise'
-import { exec } from 'child_process'
 
 import networkTools from './tools/network.js'
+import { execCommande } from './tools/cli.js'
 
 const test = _test.default(tape) // decorate tape
-
-function execCommande (cmd, t) {
-  return new Promise((resolve, reject) => {
-    exec(cmd, (error, stdout, stderr) => {
-      if (error) {
-        t.error(error)
-        if (error.code === 126) {
-          t.comment('Avez-vous fait un `chmod +x serveur.js` ?')
-        }
-        t.end()
-        return reject(error)
-      }
-      return resolve({ stdout, stderr })
-    })
-  })
-}
 
 function splitAndSort (peers) {
   return peers.replace('\n', '').split(',').sort()
