@@ -70,14 +70,16 @@ J'ai réalisé pour vous un serveur de base de données minimaliste. Pour l'exé
 Le serveur de la base de données n'accepte que trois commandes : `get`, `set` et `keys` :
 
 * get : permet de récupérer la valeur d'une clé. Si la clé n'existe pas, retourne une erreur.
-* set : permet d'associer une valeur à une clé. Si la clé n'existe pas, la valeur est affecté à la clé. Si la clé existe, elle n'est pas modifiée. Si la valeur est identique, la commande ne retourne pas d'erreur et se résout normalement sinon la commande retourne une erreur.
+* set : permet d'associer une valeur à une clé, une fois une valeur associée à une clé, **il n'est plus possible de modifier la valeur**. Si la clé n'existe pas, la valeur est affectée à la clé. Si la clé existe, elle n'est pas modifiée et dans le cas où la valeur est identique, la commande ne retourne pas d'erreur et se résout normalement sinon la commande retourne une erreur `set error : Field ${field} exists.`.
 * keys : retourne la liste des clés de la base de données.
 
 J'ai codé un *CLI* (Command Line Interface) pour passer des commandes au serveur. Pour voir les commandes que le *CLI* peut lancer : `node cli.js`.
 
-Vous pouvez voir le code du serveur et du *CLI* dans les fichiers `serveur.js` et `cli.js`. Si vous observez bien le code, vous pouvez voir un callback. Le premier paramètre de celui-ci correspond à une erreur, c'est une convention classique en Javascript. S'il n'y a pas d'erreur, on met ce paramètre à `undefined`.
+#### Utilisez le *CLI* pour lancer les trois commandes et voir le comportement du serveur.
 
-Le fichier de test `test.js` va nous permettre de tester notre serveur de base de données. Vous pouvez lancer les tests via la commande `npm test`. Ce fichier lance automatiquement le serveur de base de données et envoie les logs dans les fichiers `serveur.log` et `serveur.err`.
+Vous pouvez voir le code du serveur et du *CLI* dans les fichiers `serveur.js` et `cli.js`. Si vous observez bien le code, vous pouvez voir un callback. Le premier paramètre de celui-ci correspond à une erreur, c'est une convention classique en Javascript. S'il n'y a pas d'erreur, on met ce paramètre à `undefined`. Une commande doit **toujours** appeler le callback pour se terminer sinon vous aurez une erreur côté client.
+
+Le fichier de test `test.js` va nous permettre de tester notre serveur de base de données automatiquement. Vous pouvez lancer les tests via la commande `npm test`. **Ce fichier lance automatiquement le serveur de base de données** et envoie les logs dans les fichiers `serveur.log` et `serveur.err`. Si vous n'arrivez pas à comprendre pourquoi les tests ne fonctionnent pas, lancez manuellement le serveur et les commandes.
 
 **Vous ne devrez jamais modifier le ficher du *CLI* ou le fichier de tests**. Ils seront mis à jour automatiquement au fur et à mesure de la progression.
 
