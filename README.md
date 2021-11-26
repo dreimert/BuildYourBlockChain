@@ -38,7 +38,7 @@ Il faut maintenant faire en sorte que nos noeuds se voient et se parlent. Pour c
 
 J'ai ajouté dans le *CLI* deux commandes : `addPeer` et `peers`.
 
-La commande `addPeer` prend un port en paramètre. Ce port sera utiliser pour ajouter un nouveau voisin au noeud. Retourne une erreur si le voisin existe déjà.
+La commande `addPeer` prend un port en paramètre. Ce port sera utilisé pour ajouter un nouveau voisin au noeud. Retourne une erreur si le voisin existe déjà.
 
 La commande `peers` demande au noeuds de retourner la liste de ses voisins.
 
