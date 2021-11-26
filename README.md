@@ -98,7 +98,7 @@ Est-ce que le noeud ajouté indique bien une nouvelle connexion ? Oui ? Cool ! P
 
 Nos noeuds doivent maintenant échanger des informations. Vous allez essayer de mettre en place 3 noeuds qui communiquent entre eux et se synchronisent. Par exemple, supposons que vous utilisez les ports 3000, 3001 et 3002.
 
-Si vous avez respecter les consignes jusque là, votre noeud est connecté aux autres. Il faut maintenant mettre à jour les autres quand lui-même est modifié.
+Si vous avez respecté les consignes jusque là, votre noeud est connecté aux autres. Il faut maintenant mettre à jour les autres quand lui-même est modifié.
 
 Pour commencer, il faut stocker les sockets pour pouvoir écrire à nos contacts.
 
