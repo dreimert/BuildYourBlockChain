@@ -88,9 +88,9 @@ Quand la connexion est établie, l'événement `connect` est émit. Vous pouvez 
 
 Est-ce que le noeud ajouté indique bien une nouvelle connexion ? Oui ? Cool ! Par contre, si vous faites un `peers` sur le noeud ajouté, il n'y a pas le noeud source dans la liste des voisins. On a une commande pour mettre à jour cette liste !
 
-#### Modifiez la commande `addPeer` pour qu'elle envoie une commande `auth` après la connexion.
+#### Modifiez la commande `addPeer` pour qu'elle envoie une commande `auth` avec son propre port en paramètre à l'autre serveur.
 
-##### Indice 1 : il faut attendre la connexion pour émettre le `addPeer`.
+##### Indice 1 : il faut attendre la connexion pour émettre le `auth`.
 
 ##### Indice 2 : pour émettre une commande, regardez comment le *CLI* fait.
 
