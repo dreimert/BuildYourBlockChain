@@ -40,7 +40,7 @@ J'ai ajouté dans le *CLI* deux commandes : `addPeer` et `peers`.
 
 La commande `addPeer` prend un port en paramètre. Ce port sera utilisé pour ajouter un nouveau voisin au noeud. Retourne une erreur si le voisin existe déjà.
 
-La commande `peers` demande au noeuds de retourner la liste de ses voisins.
+La commande `peers` demande au noeud de retourner la liste de ses voisins.
 
 #### Déclarez un tableau `neighbors` contenant la liste des ports utilisés par les voisins.
 
@@ -52,7 +52,7 @@ const neighbors = [];
 
 Pour vérifier que la commande fonctionne, vous pouvez initialer le tableau avec des valeurs : `const neighbors = ['a', 'b', 'c'];`.
 
-#### Ajoutez une commande `addPeer` à votre noeud. Dans un premier temps, faites en sorte que cette commande ajoute le port à la liste des voisins s'il n'y ai pas déjà.
+#### Ajoutez une commande `addPeer` à votre noeud. Dans un premier temps, faites en sorte que cette commande ajoute le port à la liste des voisins s'il n'y est pas déjà.
 
 ##### Indice 1 :
 
