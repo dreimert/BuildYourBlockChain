@@ -6,7 +6,7 @@ import { io } from 'socket.io-client'
 
 const argv = yargs(hideBin(process.argv)) // Analyse des paramètres
   .command('get <key>', 'Récupère la valeur associé à la clé')
-  .command('set <key> <value>', 'Place une association clé / valeur')
+  .command('set <key> <value> [timestamp]', 'Place une association clé / valeur')
   .command('keys', 'Demande la liste des clés')
   .command('addPeer <peerPort>', 'Ajoute un nouveau noeud voisin')
   .command('peers', 'Demande la liste des pairs du noeud')
@@ -122,7 +122,7 @@ socket.on('connect', () => {
           info(`set ${argv.key} =>`)
 
           if (argv.timestamp) {
-            socket.emit('set', argv.key, { value: argv.value, date: argv.timestamp }, (error) => {
+            socket.emit('set', argv.key, { value: argv.value, date: +(argv.timestamp) }, (error) => {
               if (error) {
                 console.error(error)
               } else {
@@ -157,8 +157,12 @@ socket.on('connect', () => {
           if (!argv.bot) {
             console.info('keysAndTime =>')
           }
-          socket.emit('keysAndTime', (keys) => {
-            console.info(keys)
+          socket.emit('keysAndTime', (error, keys) => {
+            if (error) {
+              console.error(error)
+            } else {
+              console.info(keys)
+            }
             end()
           })
           break

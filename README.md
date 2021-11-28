@@ -31,18 +31,20 @@ L'information se propage de proche en proche jusqu'à confrontation. Un partie d
 
 #### Lancez la commande `node scenarios/latence.js`.
 
+Si vous voulez voir plus en détails ce qu'il se passe, vous pouvez ajouter l'option `-v`. C'est valable pour tous les scénarios.
+
 ## Combattre le temps par le temps
 
 Dans l'idée initiale, on ne peut pas mettre à jour une valeur. Partant de cette idée, il semble cohérent que la valeur la plus vieille soit la bonne. Je vous propose donc l'algorithme de consensus suivant : on garde la valeur la plus vieille.
 
-On a l'âge d'une valeur mais on n'en tient pas compte pour le moment et on ne la partage pas sur un `set` seulement sur un `get`. Il va falloir la rajouter dans les données échangées pour pouvoir comparer.
+On a la date de création d'une valeur mais on n'en tient pas compte pour le moment et on ne la partage pas sur un `set` seulement sur un `get`. Il va falloir la rajouter dans les données échangées pour pouvoir comparer.
 
-Pour commencer, il faut que la commande `set` accepte une valeur simple ou un object. Je vous donne le code pour faire ça :
+Pour commencer, il faut que la commande `set` accepte une valeur simple comme la chaine `'Reimert'` ou un object avec la valeur et la date. Je vous donne le code pour faire ça :
 
 ```Javascript
 socket.on('set', function(field, value, callback) {
   // Si value n'est pas un object
-  if (typeof value !== 'object') {
+  if (value === null || typeof value !== 'object') {
     // on modifie la valeur pour en faire un object
     value = {
       value: value,
@@ -59,7 +61,7 @@ J'ai modifier le *CLI* pour qu'il supporte un troisième paramètre optionnel à
 
 #### Modifiez la manière dont la commande `set` traite les clefs déjà définies pour garder la plus vielle.
 
-Vous pouvez tester avec `node scenarios/latence.js`. Si votre implémentation est correcte, le réseau devrait converger vers une seule valeur.
+Vous pouvez tester avec `node scenarios/latence.js`. Si votre implémentation est correcte, le réseau devrait converger vers une seule valeur. J'au aussi mis à jour `test.js`.
 
 Cette solution fonctionne ; tant qu'il n'y a pas de dysfonctionnements ou d'utilisateurs malveillants.
 
@@ -122,7 +124,7 @@ Dans la vie, je suis plutôt optimiste mais en informatique si ça peut mal se p
 
 #### Lancez `node scenarios/horloge.js` et observez.
 
-Mais on n'a pas envie d'envoyer la valeur à chaque synchronisation. Imaginez si c'est un fichier de plusieurs centaines de Mo ou Go ! À la place, on va utiliser l'empreinte de la valeur qui est produite par une fonction de hachage.
+Mais on n'a pas envie d'envoyer la valeur à chaque synchronisation. Imaginez si c'est un fichier de plusieurs centaines de Mo ou Go ! On ne va envoyer plusieurs To de données à chaque tentative de synchronisation ! À la place, on va utiliser l'empreinte de la valeur qui est produite par une fonction de hachage. Une sorte de carte d'identité de la valeur.
 
 ## Prenons un peu de *hash*
 

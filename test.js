@@ -1,26 +1,10 @@
 import tape from 'tape'
 import _test from 'tape-promise'
-import { exec } from 'child_process'
 
 import networkTools from './tools/network.js'
+import { execCommande } from './tools/cli.js'
 
 const test = _test.default(tape) // decorate tape
-
-function execCommande (cmd, t) {
-  return new Promise((resolve, reject) => {
-    exec(cmd, (error, stdout, stderr) => {
-      if (error) {
-        t.error(error)
-        if (error.code === 126) {
-          t.comment('Avez-vous fait un `chmod +x serveur.js` ?')
-        }
-        t.end()
-        return reject(error)
-      }
-      return resolve({ stdout, stderr })
-    })
-  })
-}
 
 function splitAndSort (peers) {
   return peers.replace('\n', '').split(',').sort()
@@ -61,7 +45,7 @@ test('Réajout à c de b', function (t) {
 })
 
 test('Vérification de la propagation de valeur', function (t) {
-  return execCommande('node ./cli.js --port=7000 --bot=true set casque quest2', t).then(({ stdout, stderr }) => {
+  return execCommande('node ./cli.js --port=7000 --bot=true set casque quest2 1234567890', t).then(({ stdout, stderr }) => {
     t.equal(stdout, 'OK\n', 'Set doit réussir')
   }).then(() => {
     return execCommande('node ./cli.js --port=7000 --bot=true get casque', t).then(({ stdout, stderr }) => {
@@ -79,7 +63,7 @@ test('Vérification de la propagation de valeur', function (t) {
 })
 
 test('Vérification de la propagation d\'une seconde valeur', function (t) {
-  return execCommande('node ./cli.js --port=7000 --bot=true set jeu beatsaber', t).then(({ stdout, stderr }) => {
+  return execCommande('node ./cli.js --port=7000 --bot=true set jeu beatsaber 1234567890', t).then(({ stdout, stderr }) => {
     t.equal(stdout, 'OK\n', 'Set doit réussir')
   }).then(() => {
     return execCommande('node ./cli.js --port=7000 --bot=true get jeu', t).then(({ stdout, stderr }) => {
