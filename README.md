@@ -6,7 +6,7 @@ Le but de cette étape est de mettre en place un algorithme de consensus pour no
 
 ## Consensus
 
-À l'étape précédente, nous avons mis en place un système distribué minimal mais qui fonctionne plus ou moins bien car il n'a pas d'algorithme de consensus. Un algorithme de consensus est un algorithme qui va permettre aux noeuds de se mettre d'accord sur une valeur. Par exemple, si deux valeurs différentes sont proposées pour une même clé, l'algorithme doit permettre d'en choisir une.
+À l'étape précédente, nous avons mis en place un système distribué minimal mais qui fonctionne plus ou moins bien car il n'a pas d'algorithme de consensus. Un algorithme de consensus est un algorithme qui va permettre aux nœuds de se mettre d'accord sur une valeur. Par exemple, si deux valeurs différentes sont proposées pour une même clé, l'algorithme doit permettre d'en choisir une.
 
 Ces désaccords peuvent être dû à :
 
@@ -14,18 +14,18 @@ Ces désaccords peuvent être dû à :
 * Il peut y avoir des dysfonctionnements : pannes de matériel ou corruptions de données.
 * Il y a des humains qui interagissent avec le système et l'infrastructure, ils peuvent être mal informés, incompétents ou malveillants.
 
-Il n'y a pas de d'algorithme de consensus ultime. Pour pouvoir mettre en place un algorithme de consensus, il faut mettre en place des contraintes qui auront un coup en temps ou en ressources.
+Il n'y a pas d'algorithme de consensus ultime. Pour pouvoir mettre en place un algorithme de consensus, il faut mettre en place des contraintes qui auront un coup en temps ou en ressources.
 
 ## Outch ! Ça lag...
 
-La latence est partout dès qu'il y a communication. L'information ne peut pas aller plus vite que la lumière, sans compter les temps de traitement. Par exemple, à l'heure où j'écris ces lignes, pour l'échange d'un message de ping, il y a 229 millisecondes de latence entre Paris et Tokyo : https://wondernetwork.com/pings. Imaginez maintenant un système distribué de plusieurs milliers de noeuds, le temps que l'information se propage d'un bout à l'autre, il peut se passer plusieurs secondes. Et beaucoup plus si vous voulez transporter une grande qualité d'informations.
+La latence est partout dès qu'il y a communication. L'information ne peut pas aller plus vite que la lumière, sans compter les temps de traitement. Par exemple, à l'heure où j'écris ces lignes, pour l'échange d'un message de ping, il y a 229 millisecondes de latence entre Paris et Tokyo : https://wondernetwork.com/pings. Imaginez maintenant un système distribué de plusieurs milliers de nœuds, le temps que l'information se propage d'un bout à l'autre, il peut se passer plusieurs secondes. Et beaucoup plus si vous voulez transporter une grande qualité d'informations.
 
 Maintenant, imaginez : à quelques millisecondes d'écart, deux noeuds du réseau reçoivent pour la clé `Ville` une valeur différentes :
 
 * Noeud 1 : Ville / Paris
 * Noeud 2 : Ville / Tokyo
 
-L'information se propage de proche en proche jusqu'à confrontation. Un partie des noeuds a associé Ville à Paris et pour l'autre, Ville égale Tokyo.
+L'information se propage de proche en proche jusqu'à confrontation. Un partie des nœuds a associé Ville à Paris et pour l'autre, Ville égale Tokyo.
 
 #### Imaginez des solutions possibles. Notez-les, on pourra s'en servir plus tard.
 
@@ -37,60 +37,60 @@ Si vous voulez voir plus en détails ce qu'il se passe, vous pouvez ajouter l'op
 
 Dans l'idée initiale, on ne peut pas mettre à jour une valeur. Partant de cette idée, il semble cohérent que la valeur la plus vieille soit la bonne. Je vous propose donc l'algorithme de consensus suivant : on garde la valeur la plus vieille.
 
-On a la date de création d'une valeur mais on n'en tient pas compte pour le moment et on ne la partage pas sur un `set` seulement sur un `get`. Il va falloir la rajouter dans les données échangées pour pouvoir comparer.
+On a la date de création d'une valeur mais on n'en tient pas compte pour le moment et on ne la partage pas sur un `set` seulement sur un `get`. Il va falloir l'ajouter dans les données échangées pour pouvoir comparer.
 
-Pour commencer, il faut que la commande `set` accepte une valeur simple comme la chaine `'Reimert'` ou un object avec la valeur et la date. Je vous donne le code pour faire ça :
+Pour commencer, il faut que la commande `set` accepte une valeur simple comme la chaine `'Reimert'` ou un objet avec la valeur et la date. Je vous donne le code pour faire ça :
 
 ```Javascript
 socket.on('set', function(field, value, callback) {
-  // Si value n'est pas un object
-  if (value === null || typeof value !== 'object') {
-    // on modifie la valeur pour en faire un object
-    value = {
-      value: value,
-      date: Date.now()
-    }
-  }
-  // ...
+  // Si value n'est pas un object
+  if (value === null || typeof value !== 'object') {
+    // on modifie la valeur pour en faire un objet
+    value = {
+      value: value,
+      date: Date.now()
+    }
+  }
+  // ...
 });
 ```
 
 J'ai modifier le *CLI* pour qu'il supporte un troisième paramètre optionnel à la commande `set`.
 
-#### Modifiez la commande `set` dans `serveur.js` pour qu'elle supporte une valeur simple ou un object.
+#### Modifiez la commande `set` dans `serveur.js` pour qu'elle supporte une valeur simple ou un objet.
 
-#### Modifiez la manière dont la commande `set` traite les clefs déjà définies pour garder la plus vielle.
+#### Modifiez la manière dont la commande `set` traite les clefs déjà définies pour garder la plus vieille.
 
-Vous pouvez tester avec `node scenarios/latence.js`. Si votre implémentation est correcte, le réseau devrait converger vers une seule valeur. J'au aussi mis à jour `test.js`.
+Vous pouvez tester avec `node scenarios/latence.js`. Si votre implémentation est correcte, le réseau devrait converger vers une seule valeur. J'ai aussi mis à jour `test.js`.
 
 Cette solution fonctionne ; tant qu'il n'y a pas de dysfonctionnements ou d'utilisateurs malveillants.
 
 ### Désynchronisation
 
-Si un noeud a un problème réseau et que des messages sont perdus, il ne sera jamais mis à jours, même s'il utilise la commande `keys`, celle-ci ne retourne pas l'horodatage de la valeur. Si il a une valeur, il la gardera.
+Si un nœud a un problème réseau et que des messages sont perdus, il ne sera jamais mis à jour, même s'il utilise la commande `keys`, celle-ci ne retourne pas l'horodatage de la valeur. Si il a une valeur, il la gardera.
 
 ### Attaques
 
 #### Qu'est-ce qui empêche un individu mal intentionné de forger un message `set` avec un *vieux* horodatage ou si l'horloge de la machine est mal réglée ? Que va t'il se passer ?
 
-Cet algorithme fonctionne dans un monde parfait, sans panne et personnes malintentionnées. Essayons de faire plus résistant.
+Cet algorithme fonctionne dans un monde parfait, sans panne ni personnes mal intentionnées. Essayons de faire plus résistant.
 
 ## Résistance aux pannes
 
-Le problème d'une panne réseau est que le noeud ne reçoit pas la mise à jour de la valeur. Une solution est de vérifier régulièrement que l'on a bien la même chose que ses voisins.
+Le problème d'une panne réseau est que le nœud ne reçoit pas la mise à jour de la valeur. Une solution est de vérifier régulièrement que l'on a bien la même chose que ses voisins.
 
 Vous pouvez voir une illustration en lançant la commande `node scenarios/panne.js`.
 
-Actuellement, la commande `keys` ne retourne que la liste des clés mais pas l'horodatage. Avec celle-ci, on ne peut pas savoir si une clé a changée. Le code suivant permet d'extraire uniquement le champs *date* de chaque clé de la base de données.
+Actuellement, la commande `keys` ne retourne que la liste des clés mais pas l'horodatage. Avec celle-ci, on ne peut pas savoir si une clé a changé. Le code suivant permet d'extraire uniquement le champ *date* de chaque clé de la base de données.
 
 ```Javascript
 const extractHorodatage = function(db) {
-  return Object.keys(db).reduce(function(result, key) {
-    result[key] = {
-      date: db[key].date
-    };
-    return result;
-  }, {});
+  return Object.keys(db).reduce(function(result, key) {
+    result[key] = {
+      date: db[key].date
+    };
+    return result;
+  }, {});
 };
 // Si db = {a: {value: 'Dublin', date: 123456789}}
 // retourne : {a: {date: 123456789}}
@@ -106,7 +106,7 @@ Il ne reste plus qu'à appeler la commande la commande `keysAndTime` à la place
 
 ```Javascript
 for (let key in object) {
-  console.log(object[key])
+  console.log(object[key])
 }
 // Si object vaut : {a: {date: 123456789}}
 // Affiche : {date: 123456789}
@@ -120,51 +120,51 @@ for (let key in object) {
 
 Dans la vie, je suis plutôt optimiste mais en informatique si ça peut mal se passer, ça se passera mal. Et puis, j'ai besoin de ce ressort scénaristique de fou pour vous amener là où je veux : La solution précédente fonctionne ? Vous êtes sûr ?
 
-#### Que se passe-t'il si pour un même date, il y a deux valeurs différentes ?
+#### Que se passe-t-il si pour une même date, il y a deux valeurs différentes ?
 
 #### Lancez `node scenarios/horloge.js` et observez.
 
-Mais on n'a pas envie d'envoyer la valeur à chaque synchronisation. Imaginez si c'est un fichier de plusieurs centaines de Mo ou Go ! On ne va envoyer plusieurs To de données à chaque tentative de synchronisation ! À la place, on va utiliser l'empreinte de la valeur qui est produite par une fonction de hachage. Une sorte de carte d'identité de la valeur.
+Mais on n'a pas envie d'envoyer la valeur à chaque synchronisation. Imaginez si c'est un fichier de plusieurs centaines de Mo ou Go ! On ne va pas envoyer plusieurs To de données à chaque tentative de synchronisation ! À la place, on va utiliser l'empreinte de la valeur qui est produite par une fonction de hachage. Une sorte de carte d'identité de la valeur.
 
 ## Prenons un peu de *hash*
 
-Une fonction de hachage est une fonction qui prend en entrée un ensemble de données et retourne une empreinte, aussi appelée *hash*. L'empreinte respecte deux principes : Elle est unique pour un ensemble de données d'entrée, et une empreinte donnée ne permet pas de remonter à l'ensemble initial. On parle de non-collision et de non calculabilité de la pré-image. Cette empreinte est de taille fixe quelque-soit l'entrée. Une fonction couramment utilisé est SHA. Voici quelques exemples d'empreinte :
+Une fonction de hachage est une fonction qui prend en entrée un ensemble de données et retourne une empreinte, aussi appelée *hash*. L'empreinte respecte deux principes : Elle est unique pour un ensemble de données d'entrée, et une empreinte donnée ne permet pas de remonter à l'ensemble initial. On parle de non-collision et de non calculabilité de la pré-image. Cette empreinte est de taille fixe quelque-soit l'entrée. Une fonction couramment utilisée est SHA. Voici quelques exemples d'empreinte :
 
 ```Bash
 > echo "Blockchain" | shasum
-# efcf8baf5959ad1ebc7f4950425ef1c2eae9cbd9  -
+# efcf8baf5959ad1ebc7f4950425ef1c2eae9cbd9  -
 
 > echo "Block" | shasum
-# d1a6b1157e37bdaad78bec4c3240f0d6c576ad21  -
+# d1a6b1157e37bdaad78bec4c3240f0d6c576ad21  -
 
 > echo "Vous commencez à voir le principe ?" | shasum
-# 25abec7ced7642b886c1bffbc710cc3439f23ab7  -
+# 25abec7ced7642b886c1bffbc710cc3439f23ab7  -
 ```
 
 Une propriété intéressante est qu'une petite modification dans l'entrée change totalement l'empreinte :
 
 ```Bash
 > echo "Blockchain" | shasum
-# efcf8baf5959ad1ebc7f4950425ef1c2eae9cbd9  -
+# efcf8baf5959ad1ebc7f4950425ef1c2eae9cbd9  -
 
 > echo "blockchain" | shasum
-# ea5f179324c233b002fa8ac4201fa216001515e5  -
+# ea5f179324c233b002fa8ac4201fa216001515e5  -
 ```
 
-Les fonctions de hachage sont couramment utilisées pour vérifier que des données n'ont pas été corrompu lors d'un téléchargement par exemple. Le code suivant permet de produire une empreinte en Javascrip.
+Les fonctions de hachage sont couramment utilisées pour vérifier que des données n'ont pas été corrompues lors d'un téléchargement par exemple. Le code suivant permet de produire une empreinte en Javascript.
 
 ```Javascript
 const crypto = require('crypto');
 
 // Retourne l'empreinte de data.
 const getHash = function getHash(data) {
-  return crypto.createHash('sha256').update(data, 'utf8').digest('hex');
+  return crypto.createHash('sha256').update(data, 'utf8').digest('hex');
 }
 ```
 
 ## Spoiler : cette fois, c'est la bonne ... avant l'étape suivante.
 
-#### Ajoutez un champs `hash` dans votre base de données.
+#### Ajoutez un champ `hash` dans votre base de données.
 
 #### Modifiez `set` pour calculer l'empreinte de la valeur.
 
@@ -180,9 +180,9 @@ Vous êtes maintenant résistant à la panne. Enfin, pas à l'instant T mais c'e
 
 ## Conclusion
 
-Nous avons mis en place un algorithme de consensus qui résiste aux problèmes de latence et de pannes réseaux. Pour résister, nous avons ajouter des données et mis en place des échanges d'informations supplémentaires, ce qui représente un coût.
+Nous avons mis en place un algorithme de consensus qui résiste aux problèmes de latence et de panne réseaux. Pour résister, nous avons ajouté des données et mis en place des échanges d'informations supplémentaires, ce qui représente un coût.
 
-Nous n'avons pas traité le troisième cas de désaccords dù à un utilisateur potentiellement malveillants. Nous traiteront se problème à l'étape suivante.
+Nous n'avons pas traité le troisième cas de désaccords dù à un utilisateur potentiellement malveillants. Nous traiterons ce problème à l'étape suivante.
 
 ## Suite
 
