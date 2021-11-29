@@ -111,7 +111,7 @@ socket.on('connect', () => {
 
           socket.emit('get', argv.key, (error, res) => {
             if (error) {
-              console.error(error)
+              console.error('ERROR:', error)
             } else {
               console.info(res.value)
             }
@@ -124,7 +124,7 @@ socket.on('connect', () => {
           if (argv.timestamp) {
             socket.emit('set', argv.key, { value: argv.value, date: +(argv.timestamp) }, (error) => {
               if (error) {
-                console.error(error)
+                console.error('ERROR:', error)
               } else {
                 console.info('OK')
               }
@@ -133,7 +133,7 @@ socket.on('connect', () => {
           } else {
             socket.emit('set', argv.key, argv.value, (error) => {
               if (error) {
-                console.error(error)
+                console.error('ERROR:', error)
               } else {
                 console.info('OK')
               }
@@ -146,7 +146,7 @@ socket.on('connect', () => {
 
           socket.emit('keys', (error, keys) => {
             if (error) {
-              console.error(error)
+              console.error('ERROR:', error)
             } else {
               console.info(keys.join(','))
             }
@@ -159,7 +159,7 @@ socket.on('connect', () => {
           }
           socket.emit('keysAndTime', (error, keys) => {
             if (error) {
-              console.error(error)
+              console.error('ERROR:', error)
             } else {
               console.info(keys)
             }
@@ -171,7 +171,7 @@ socket.on('connect', () => {
 
           socket.emit('addPeer', argv.peerPort, (error) => {
             if (error) {
-              console.error(error)
+              console.error('ERROR:', error)
             } else {
               console.info('OK')
             }
@@ -183,7 +183,7 @@ socket.on('connect', () => {
 
           socket.emit('peers', (error, peers) => {
             if (error) {
-              console.error(error)
+              console.error('ERROR:', error)
             } else {
               console.info(peers.join(','))
             }
