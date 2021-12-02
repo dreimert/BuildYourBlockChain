@@ -40,7 +40,7 @@ test('Vérification des voisins de c', function (t) {
 
 test('Réajout à c de b', function (t) {
   return execCommande('node ./cli.js --port=7002 --bot=true addPeer 7001', t).then(({ stdout, stderr }) => {
-    t.equal(stderr, 'neighbor exists\n', 'Doit refuser avec une erreur "neighbor exists"')
+    t.equal(stderr, 'ERROR: neighbor exists\n', 'Doit refuser avec une erreur "neighbor exists"')
   })
 })
 
