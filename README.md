@@ -77,9 +77,13 @@ Le code suivant permet de créer une nouvelle connexion vers un autre nœud.
 ```Javascript
 import { io as ioClient } from 'socket.io-client'
 
-const socket = ioClient(`http://localhost:${port}`, {
-  path: '/byc'
-});
+socket.on('addPeer', function (...) {
+  // ...
+  const socket = ioClient(`http://localhost:${port}`, {
+    path: '/byc'
+  });
+  // ...
+})
 ```
 
 Quand la connexion est établie, l'événement `connect` est émis. Vous pouvez observer le code du *CLI* pour avoir un exemple.
