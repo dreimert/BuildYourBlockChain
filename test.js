@@ -76,13 +76,13 @@ test('Récupération de la valeur associé à la clef "name"', function (t) {
 
 test('Récupération de la valeur associé à la clef "jeNeSuisPasDef"', function (t) {
   return execCommande('node ./cli.js --port=3000 --bot=true get jeNeSuisPasDef', t).then(({ stdout, stderr }) => {
-    t.equal(stderr, 'Field jeNeSuisPasDef not exists\n', 'Retour une erreur')
+    t.equal(stderr, 'ERROR: Field jeNeSuisPasDef not exists\n', 'Retour une erreur')
   })
 })
 
 test('Affectation de la valeur "Frenot" à la clef "name"', function (t) {
   return execCommande('node ./cli.js --port=3000 --bot=true set name Frenot', t).then(({ stdout, stderr }) => {
-    t.equal(stderr, 'set error : Field name exists.\n', 'Set doit échouer car la valeur change')
+    t.equal(stderr, 'ERROR: set error : Field name exists.\n', 'Set doit échouer car la valeur change')
   })
 })
 
