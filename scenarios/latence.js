@@ -10,9 +10,9 @@ networkTools.runNetwork(networkTools.parseTopology('a-b b-c c-d d-e e-f f-g g-h 
   console.info('Attribution de la valeur Paris pour a et Tokio pour z.')
   return Promise.all([
     // Initialisation de a avec Paris
-    execCommande(`node ./cli.js --port=${networkTools.network.a.port} --bot=true set Ville Paris`),
+    execCommande(`node ./cli.js --port=${networkTools.network.a.port} --bot=true set Ville Paris 10000`),
     // Initialisation de z avec Tokio
-    execCommande(`node ./cli.js --port=${networkTools.network.z.port} --bot=true set Ville Tokio`)
+    execCommande(`node ./cli.js --port=${networkTools.network.z.port} --bot=true set Ville Tokio 10001`)
   ])
 }).then(
   networkTools.wait(5000) // On attend 15 secondes. C'est complémentement arbitraire.
