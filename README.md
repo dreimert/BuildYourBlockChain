@@ -154,7 +154,7 @@ Une propriété intéressante est qu'une petite modification dans l'entrée chan
 Les fonctions de hachage sont couramment utilisées pour vérifier que des données n'ont pas été corrompues lors d'un téléchargement par exemple. Le code suivant permet de produire une empreinte en Javascript.
 
 ```Javascript
-const crypto = require('crypto');
+import crypto from 'crypto'
 
 // Retourne l'empreinte de data.
 const getHash = function getHash(data) {
