@@ -1,194 +1,87 @@
-# Build Your BlockChain - Consensus
+# Build Your BlockChain - Blockchain
 
 ## Objectif
 
-Le but de cette étape est de mettre en place un algorithme de consensus pour notre base de données.
+Le but de cette étape est de manipuler une blockchain un minimum fonctionnelle.
 
-## Consensus
+## 1 - Lancement
 
-À l'étape précédente, nous avons mis en place un système distribué minimal mais qui fonctionne plus ou moins bien car il n'a pas d'algorithme de consensus. Un algorithme de consensus est un algorithme qui va permettre aux nœuds de se mettre d'accord sur une valeur. Par exemple, si deux valeurs différentes sont proposées pour une même clé, l'algorithme doit permettre d'en choisir une.
+Cette étape est indépendante des précédentes. Vous ne devez plus lancer `serveur.js` mais `noeud.js`. J'ai aussi modifié le *CLI* pour qu'il fonctionne avec `noeud.js`.
 
-Ces désaccords peuvent être dû à :
+Vous pouvez accéder à l'aide du *CLI* via `node cli.js` et à celle du noeud via `node noeud.js --help`.
 
-* des contraintes du monde physique comme la vitesse de la lumière. L'information ne peut pas se téléporter d'un serveur à l'autre, il y a un délai : la latence.
-* Il peut y avoir des dysfonctionnements : pannes de matériel ou corruptions de données.
-* Il y a des humains qui interagissent avec le système et l'infrastructure, ils peuvent être mal informés, incompétents ou malveillants.
+Le code de `noeud.js` est fonctionnel mais par la suite de ce TP vous devrez le modifier pour ajouter des fonctionnalités.
 
-Il n'y a pas d'algorithme de consensus ultime. Pour pouvoir mettre en place un algorithme de consensus, il faut mettre en place des contraintes qui auront un coup en temps ou en ressources.
+#### À l'aide des aides, lancer un noeud. Expliquer la procédure.
 
-## Outch ! Ça lag...
+##### Indice : vous **n**'avez **pas** besoin de modifier le code.
 
-La latence est partout dès qu'il y a communication. L'information ne peut pas aller plus vite que la lumière, sans compter les temps de traitement. Par exemple, à l'heure où j'écris ces lignes, pour l'échange d'un message de ping, il y a 229 millisecondes de latence entre Paris et Tokyo : https://wondernetwork.com/pings. Imaginez maintenant un système distribué de plusieurs milliers de nœuds, le temps que l'information se propage d'un bout à l'autre, il peut se passer plusieurs secondes. Et beaucoup plus si vous voulez transporter une grande qualité d'informations.
+## 2 - À deux (ou plus), c'est mieux !
 
-Maintenant, imaginez : à quelques millisecondes d'écart, deux noeuds du réseau reçoivent pour la clé `Ville` une valeur différentes :
+Toujours sans modifier le code, essayez de lancer deux noeuds en parallèle et de faire en sorte qu'ils communiques.
 
-* Noeud 1 : Ville / Paris
-* Noeud 2 : Ville / Tokyo
+En regardant l'aide du noeud, lancez les noeuds pour qu'ils minent des blocks. Observez ce qu'il se passe.
 
-L'information se propage de proche en proche jusqu'à confrontation. Un partie des nœuds a associé Ville à Paris et pour l'autre, Ville égale Tokyo.
+#### Expliquez comment faire pour que les noeuds se synchronisent.
 
-#### Imaginez des solutions possibles. Notez-les, on pourra s'en servir plus tard.
+##### Indice : si le noeud n'est pas assez verbeux, il y a une option pour ça.
 
-#### Lancez la commande `node scenarios/latence.js`.
+## 3 - Connectons-nous !
 
-Si vous voulez voir plus en détails ce qu'il se passe, vous pouvez ajouter l'option `-v`. C'est valable pour tous les scénarios.
+Durant ce TP, j'ai un noeud qui tourne sur https://syd.reimert.fr.
 
-## Combattre le temps par le temps
+#### Essayez de vous connecter à mon noeud et de vous synchroniser. Comment avez-vous fait ?
 
-Dans l'idée initiale, on ne peut pas mettre à jour une valeur. Partant de cette idée, il semble cohérent que la valeur la plus vieille soit la bonne. Je vous propose donc l'algorithme de consensus suivant : on garde la valeur la plus vieille.
+## 4 - Laisser une trace dans ce monde
 
-On a la date de création d'une valeur mais on n'en tient pas compte pour le moment et on ne la partage pas sur un `set` seulement sur un `get`. Il va falloir l'ajouter dans les données échangées pour pouvoir comparer.
+En observant le code du noeud, de `cli.js` mais aussi `class/Transaction.js`, modifiez `noeud.js` pour que la commande `node cli.js identity <name>` fonctionne.
 
-Pour commencer, il faut que la commande `set` accepte une valeur simple comme la chaine `'Reimert'` ou un objet avec la valeur et la date. Je vous donne le code pour faire ça :
+Attention, faites vos tests en local, il serai dommage d'écrire n'importe quoi publiquement ;)
 
-```Javascript
-socket.on('set', function(field, value, callback) {
-  // Si value n'est pas un object
-  if (value === null || typeof value !== 'object') {
-    // on modifie la valeur pour en faire un objet
-    value = {
-      value: value,
-      date: Date.now()
-    }
-  }
-  // ...
-});
-```
+#### Inscrivez une unique transaction de type `identity` dans la blockchain publique (https://syd.reimert.fr).
 
-J'ai modifier le *CLI* pour qu'il supporte un troisième paramètre optionnel à la commande `set`.
+## 5 - Contribuer au réseau
 
-#### Modifiez la commande `set` dans `serveur.js` pour qu'elle supporte une valeur simple ou un objet.
+Mon noeud mine des blocks sans demander rétribution mais tout le monde n'est pas aussi généreux.
 
-#### Modifiez la manière dont la commande `set` traite les clefs déjà définies pour garder la plus vieille.
+#### Modifiez `noeud.js` pour que votre noeud ajoute une transaction de type `reward` aux blocks qu'il mine.
 
-Vous pouvez tester avec `node scenarios/latence.js`. Si votre implémentation est correcte, le réseau devrait converger vers une seule valeur. J'ai aussi mis à jour `test.js`.
+##### Indice : ligne 135 du noeud de base, j'ai même laissé en commentaire un autre indice ;)
 
-Cette solution fonctionne ; tant qu'il n'y a pas de dysfonctionnements ou d'utilisateurs malveillants.
+## 6 - Ajuster la difficulté
 
-### Désynchronisation
+Vous avez déjà vécu cette sensation que le temps défile trop vite comme moi pour préparer cette étape ? Ou au contraire, qu'il est lent et que ce cours ne va jamais finir ?
 
-Si un nœud a un problème réseau et que des messages sont perdus, il ne sera jamais mis à jour, même s'il utilise la commande `keys`, celle-ci ne retourne pas l'horodatage de la valeur. Si il a une valeur, il la gardera.
+Dans la blockchain, la vitesse d'ajout des blocks peut varier avec la modification de la puissance de calcul des participants mais on veut qu'en moyenne il y ai toujours le même temps entre les blocks.
 
-### Attaques
+Dans notre protocole, je fixe l'objectif à **un block toutes les 10 secondes** et la réévaluation de la difficulté **tous les 60 blocks** soit environ toutes les 10 minutes.
 
-#### Qu'est-ce qui empêche un individu mal intentionné de forger un message `set` avec un *vieux* horodatage ou si l'horloge de la machine est mal réglée ? Que va t'il se passer ?
+#### Modifiez `Blockchain.buildNextBlock` et `Block.verify` pour implémenter la réévaluation.
 
-Cet algorithme fonctionne dans un monde parfait, sans panne ni personnes mal intentionnées. Essayons de faire plus résistant.
+##### Indice : Pour éviter divers problèmes durant le TP, mon noeud public n'implémente pas la réévaluation de la difficulté.
 
-## Résistance aux pannes
+##### Indice : `100 % 12 === 4`
 
-Le problème d'une panne réseau est que le nœud ne reçoit pas la mise à jour de la valeur. Une solution est de vérifier régulièrement que l'on a bien la même chose que ses voisins.
+#### Décrivez les modifications et pourquoi.
 
-Vous pouvez voir une illustration en lançant la commande `node scenarios/panne.js`.
+## 7 - Appelez le prof
 
-Actuellement, la commande `keys` ne retourne que la liste des clés mais pas l'horodatage. Avec celle-ci, on ne peut pas savoir si une clé a changé. Le code suivant permet d'extraire uniquement le champ *date* de chaque clé de la base de données.
-
-```Javascript
-const extractHorodatage = function(db) {
-  return Object.keys(db).reduce(function(result, key) {
-    result[key] = {
-      date: db[key].date
-    };
-    return result;
-  }, {});
-};
-// Si db = {a: {value: 'Dublin', date: 123456789}}
-// retourne : {a: {date: 123456789}}
-```
-
-#### Écrivez une commande `keysAndTime` qui retourne la liste des clés avec l'horodatage.
-
-Il ne reste plus qu'à appeler la commande la commande `keysAndTime` à la place de `keys` à la synchronisation pour détecter une désynchronisation et la corriger. Quand vous corrigez la valeur, informez vos voisins qui sont peut-être aussi désynchronisés.
-
-#### Mettez en place la mécanique de détection et de correction.
-
-##### Indice :
-
-```Javascript
-for (let key in object) {
-  console.log(object[key])
-}
-// Si object vaut : {a: {date: 123456789}}
-// Affiche : {date: 123456789}
-```
-
-#### Notifiez les voisins du changement.
-
-#### Vérifier le bon fonctionnement en exécutant `node scenarios/panne.js`.
-
-## C'est toujours un problème de temps
-
-Dans la vie, je suis plutôt optimiste mais en informatique si ça peut mal se passer, ça se passera mal. Et puis, j'ai besoin de ce ressort scénaristique de fou pour vous amener là où je veux : La solution précédente fonctionne ? Vous êtes sûr ?
-
-#### Que se passe-t-il si pour une même date, il y a deux valeurs différentes ?
-
-#### Lancez `node scenarios/horloge.js` et observez.
-
-Mais on n'a pas envie d'envoyer la valeur à chaque synchronisation. Imaginez si c'est un fichier de plusieurs centaines de Mo ou Go ! On ne va pas envoyer plusieurs To de données à chaque tentative de synchronisation ! À la place, on va utiliser l'empreinte de la valeur qui est produite par une fonction de hachage. Une sorte de carte d'identité de la valeur.
-
-## Prenons un peu de *hash*
-
-Une fonction de hachage est une fonction qui prend en entrée un ensemble de données et retourne une empreinte, aussi appelée *hash*. L'empreinte respecte deux principes : Elle est unique pour un ensemble de données d'entrée, et une empreinte donnée ne permet pas de remonter à l'ensemble initial. On parle de non-collision et de non calculabilité de la pré-image. Cette empreinte est de taille fixe quelque-soit l'entrée. Une fonction couramment utilisée est SHA. Voici quelques exemples d'empreinte :
-
-```Bash
-> echo "Blockchain" | shasum
-# efcf8baf5959ad1ebc7f4950425ef1c2eae9cbd9  -
-
-> echo "Block" | shasum
-# d1a6b1157e37bdaad78bec4c3240f0d6c576ad21  -
-
-> echo "Vous commencez à voir le principe ?" | shasum
-# 25abec7ced7642b886c1bffbc710cc3439f23ab7  -
-```
-
-Une propriété intéressante est qu'une petite modification dans l'entrée change totalement l'empreinte :
-
-```Bash
-> echo "Blockchain" | shasum
-# efcf8baf5959ad1ebc7f4950425ef1c2eae9cbd9  -
-
-> echo "blockchain" | shasum
-# ea5f179324c233b002fa8ac4201fa216001515e5  -
-```
-
-Les fonctions de hachage sont couramment utilisées pour vérifier que des données n'ont pas été corrompues lors d'un téléchargement par exemple. Le code suivant permet de produire une empreinte en Javascript.
-
-```Javascript
-const crypto = require('crypto');
-
-// Retourne l'empreinte de data.
-const getHash = function getHash(data) {
-  return crypto.createHash('sha256').update(data, 'utf8').digest('hex');
-}
-```
-
-## Spoiler : cette fois, c'est la bonne ... avant l'étape suivante.
-
-#### Ajoutez un champ `hash` dans votre base de données.
-
-#### Modifiez `set` pour calculer l'empreinte de la valeur.
-
-#### Modifiez `set` pour qu'en cas de date identique mais hash différent, on retient le plus petit.
-
-#### Éditez la commande `keysAndTime` pour ajouter le hash.
-
-#### Modifiez votre algorithme de synchronisation pour vérifier le hash et appliquer les modifications comme pour `set`.
-
-#### Lancez `node scenarios/horloge.js` et observez.
-
-Vous êtes maintenant résistant à la panne. Enfin, pas à l'instant T mais c'est déjà pas mal !
+J'ai pas trop d'idée là. Appelez-mois le jour du TP ;)
 
 ## Conclusion
 
-Nous avons mis en place un algorithme de consensus qui résiste aux problèmes de latence et de panne réseaux. Pour résister, nous avons ajouté des données et mis en place des échanges d'informations supplémentaires, ce qui représente un coût.
+La blockchain que je vous propose est très loin d'être parfaite. Elle est facilement attaquable et on peut faire un peu n'importe quoi avec mais elle est fonctionnelle.
 
-Nous n'avons pas traité le troisième cas de désaccords dù à un utilisateur potentiellement malveillants. Nous traiterons ce problème à l'étape suivante.
+C'est une bonne base pour aller plus loin :
+- transactions monétaires
+- langage de script
+- votre imagination
 
-## Suite
+## Suite (coming soon)
 
-Aller à l'étape 3 : `git checkout etape-3`.
+Aller à l'étape 4 : `git checkout etape-4`.
 
 Pour continuer à lire le sujet :
 
 * soit vous lisez le fichier `README.md` sur votre machine.
-* soit sur GitHub, au-dessus de la liste des fichiers, vous pouvez cliquer sur `Branch: master` et sélectionner `etape-3`.
+* soit sur GitHub, au-dessus de la liste des fichiers, vous pouvez cliquer sur `Branch: master` et sélectionner `etape-4`.
