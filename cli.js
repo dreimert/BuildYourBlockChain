@@ -117,7 +117,7 @@ function buildCommand (argv, info) {
   } else if (argv._[0] === 'mine') {
     info(`mine ${argv.state} =>`)
 
-    params = { state: argv.stat }
+    params = { state: argv.state }
   } else if (argv._[0] === 'addPeer') {
     info(`addPeer ${argv.peerUrl} =>`)
 
