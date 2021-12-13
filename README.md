@@ -20,11 +20,13 @@ Le code de `noeud.js` est fonctionnel mais par la suite de ce TP vous devrez le 
 
 Toujours sans modifier le code, essayez de lancer deux noeuds en parallèle et de faire en sorte qu'ils communiques.
 
-En regardant l'aide du noeud, lancez les noeuds pour qu'ils minent des blocks. Observez ce qu'il se passe.
+En regardant l'aide du noeud et non celle du *CLI* (l'interprétation de la commande n'est pas codé), lancez les noeuds pour qu'ils minent des blocks. Observez ce qu'il se passe.
 
 #### Expliquez comment faire pour que les noeuds se synchronisent.
 
 ##### Indice : si le noeud n'est pas assez verbeux, il y a une option pour ça.
+
+#### Modifier `noeud.js` pour que la commande `node cli.js mine <state>` fonctionne.
 
 ## 3 - Connectons-nous !
 
