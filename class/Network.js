@@ -7,10 +7,11 @@ import EventEmitter from 'events'
 import log from './log.js'
 
 export class Network extends EventEmitter {
-  constructor (port = 3000, url = 'http://localhost' + port) {
+  constructor (port = 3000, url = 'http://localhost' + port, nodeId) {
     super()
     this.port = port
     this.url = url
+    this.nodeId = nodeId
     this.neighbors = []
     this.sockets = []
   }
@@ -72,6 +73,7 @@ export class Network extends EventEmitter {
       const error = new Error('neighbor exists')
       log.warn(error)
       callback(error.message)
+      return false
     } else {
       if (!this.neighbors.includes(url)) {
         this.neighbors.push(url)
@@ -81,7 +83,8 @@ export class Network extends EventEmitter {
         path: '/byc',
         auth: {
           url: this.url, // socket.handshake.auth
-          isServer: true
+          isServer: true,
+          nodeId: this.nodeId
         }
       })
 
@@ -99,6 +102,8 @@ export class Network extends EventEmitter {
 
         callback()
       })
+
+      return neighborSocket
     }
   }
 

@@ -32,11 +32,11 @@ export class Transaction {
       verify.end()
 
       if (this.type === 'set') {
-        this.validaded = verify.verify(this.user, this.signature, 'hex') && this.id === this.getHash() && this.params.key && this.params.value
+        this.validaded = verify.verify(this.user, this.signature, 'hex') && this.id === this.getHash() && this.params.key && this.params.value && Object.keys(this.params).length === 2
       } else if (this.type === 'identity') {
-        this.validaded = verify.verify(this.user, this.signature, 'hex') && this.id === this.getHash() && this.params.name
+        this.validaded = verify.verify(this.user, this.signature, 'hex') && this.id === this.getHash() && this.params.name && Object.keys(this.params).length === 1
       } else if (this.type === 'reward') {
-        this.validaded = verify.verify(this.user, this.signature, 'hex') && this.id === this.getHash()
+        this.validaded = verify.verify(this.user, this.signature, 'hex') && this.id === this.getHash() && this.params === null
       } else {
         this.validaded = false
       }

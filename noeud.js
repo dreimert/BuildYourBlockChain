@@ -67,19 +67,21 @@ try {
   publicKey = fs.readFileSync(`./wallets/${argv.wallet}/pub`, 'utf8')
 } catch (e) {
   if (e.code === 'ENOENT') {
-    console.error(`Le wallet ${argv.wallet} n'existe pas. Vous devez utiliser le CLI pour le créer`)
+    log.error(`Le wallet ${argv.wallet} n'existe pas. Vous devez utiliser le CLI pour le créer`)
   } else {
-    console.error(e)
+    log.error(e)
   }
   process.exit(1)
 }
+
+const nodeId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString(36)
 
 // premier block de la chaine
 const genesis = new Block(0, null, [], argv.bootstrap || Date.now())
 
 genesis.powSync() // calcul de la preuve
 
-const network = new Network(argv.port, argv.url)
+const network = new Network(argv.port, argv.url, nodeId)
 const miner = new Miner()
 const blockchain = new Blockchain(genesis)
 
@@ -88,6 +90,8 @@ if (argv.verbose) {
   log.verbose = true
   log.info('Mode verbeux')
 }
+
+log.info('My node id:', nodeId)
 
 if (argv.saveOnSigkill) {
   process.on('SIGINT', () => {
@@ -125,7 +129,7 @@ if (argv.mine) {
 async function setBlock (block, socket, callback = () => {}) {
   if (!block.isValid()) {
     const error = new Error('block error : block invalid')
-    log.warn(error)
+    log.warn(error, block)
     callback(error.message)
   } else {
     if (await blockchain.addBlock(block, socket)) {
@@ -136,9 +140,8 @@ async function setBlock (block, socket, callback = () => {}) {
         // indice : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift
         miner.findPow(nextBlock)
       }
-    } else {
-      log.warn('add fail', block)
     }
+
     callback()
   }
 }
@@ -215,7 +218,7 @@ network.on('transaction', function (socket, transaction, callback) {
 })
 
 network.on('block', function (socket, block, callback) {
-  log.info('block', block.id)
+  log.info('block', block.id, 'from', socket.id)
 
   block = Block.fromObject(block)
 
@@ -243,7 +246,17 @@ network.on('cmd', function (socket, cmd, callback) {
     }
   } else if (cmd.type === 'addPeer') {
     log.info('cmd::addPeer', cmd.params.url, cmd.params.port)
-    network.addPeer(cmd.params.url, cmd.params.port, callback)
+    const s = network.addPeer(cmd.params.url, cmd.params.port, callback)
+
+    if (s) {
+      s.emit('last', (error, last) => {
+        if (error) {
+          log.error('addPeer::last fail:', error)
+        }
+
+        setBlock(Block.fromObject(last), s, callback)
+      })
+    }
   } else {
     const error = new Error('cmd error : type inconnue')
     log.info(error)

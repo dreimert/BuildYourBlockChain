@@ -155,35 +155,19 @@ function sendCommand (argv) {
     requestTimeout: 5000
   })
 
-  socket.on('error', (error) => {
-    console.error('error:', error)
-    socket.close()
-  })
+  function handleError (name) {
+    socket.on(name, (error) => {
+      console.error(name, '=>', error)
+      socket.close()
+    })
+  }
 
-  socket.on('reconnect', (error) => {
-    console.error('reconnect:', error)
-    socket.close()
-  })
-
-  socket.on('reconnect_attempt', (error) => {
-    console.error('reconnect:', error)
-    socket.close()
-  })
-
-  socket.on('reconnect_error', (error) => {
-    console.error('reconnect:', error)
-    socket.close()
-  })
-
-  socket.on('reconnect_failed', (error) => {
-    console.error('reconnect:', error)
-    socket.close()
-  })
-
-  socket.on('connect_error', (error) => {
-    console.error('connect_error:', error)
-    socket.close()
-  })
+  handleError('error')
+  handleError('reconnect')
+  handleError('reconnect_attempt')
+  handleError('reconnect_error')
+  handleError('reconnect_failed')
+  handleError('connect_error')
 
   socket.on('disconnect', () => {
     info('Disconnect')
@@ -193,6 +177,52 @@ function sendCommand (argv) {
     info('Connection établie')
 
     let id
+
+    function parseCommande () {
+      function emit (...args) {
+        return new Promise((resolve, reject) => {
+          socket.emit(...args, (error, res) => {
+            if (error) {
+              console.error('ERROR:', error)
+              reject(error)
+            } else {
+              resolve(res)
+            }
+          })
+        })
+      }
+
+      const command = argv._[0]
+
+      switch (command) {
+        case 'get':
+          info(`Commande get ${argv.key} =>`)
+          return emit('get', argv.key).then((value) => console.info(value))
+        case 'keys':
+        case 'peers':
+          info(`${command} =>`)
+          return emit(command).then((res) => console.info(res.join(',')))
+        case 'identities':
+        case 'rewards':
+        case 'last':
+          info(`${command} =>`)
+          return emit(command).then((res) => console.info(res))
+        case 'blockById':
+          info('blockById argv.id =>')
+          return emit('blockById', argv.id).then((block) => console.info(block))
+        case 'blockByIndex':
+          info('blockByIndex argv.index =>')
+          return emit('blockByIndex', argv.index).then((block) => console.info(block))
+        case 'set':
+        case 'mine':
+        case 'addPeer':
+        case 'identity':
+          return emit('cmd', buildCommand(argv, info)).then((block) => console.info('OK'))
+        default:
+          console.error('Commande inconnue')
+          return Promise.resolve()
+      }
+    }
 
     // Returns a race between our timeout and the passed in promise
     return Promise.race([
@@ -204,129 +234,9 @@ function sendCommand (argv) {
           info('Le serveur ne répond pas...')
         }, 5000)
       }),
-      new Promise((resolve, reject) => {
-        function end () {
-          clearTimeout(id)
-          socket.close()
-          resolve()
-        }
-
-        let cmd, publicKey, privateKey
-
-        switch (argv._[0]) {
-          case 'get':
-            info(`Commande get ${argv.key} =>`)
-
-            socket.emit('get', argv.key, (error, res) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(res)
-              }
-              end()
-            })
-            break
-          case 'keys':
-            info('keys =>')
-
-            socket.emit('keys', (error, keys) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(keys.join(','))
-              }
-              end()
-            })
-            break
-          case 'identities':
-            info('identities =>')
-
-            socket.emit('identities', (error, identities) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(identities)
-              }
-              end()
-            })
-            break
-          case 'rewards':
-            info('rewards =>')
-
-            socket.emit('rewards', (error, rewards) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(rewards)
-              }
-              end()
-            })
-            break
-          case 'peers':
-            info('peers =>')
-
-            socket.emit('peers', (error, peers) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(peers.join(','))
-              }
-              end()
-            })
-            break
-          case 'last':
-            info('last =>')
-
-            socket.emit('last', (error, block) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(block)
-              }
-              end()
-            })
-            break
-          case 'blockById':
-            info('blockById argv.id =>')
-
-            socket.emit('blockById', argv.id, (error, block) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(block)
-              }
-              end()
-            })
-            break
-          case 'blockByIndex':
-            info('blockByIndex argv.index =>')
-
-            socket.emit('blockByIndex', argv.index, (error, block) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info(block)
-              }
-              end()
-            })
-            break
-          case 'set':
-          case 'mine':
-          case 'addPeer':
-          case 'identity':
-            socket.emit('cmd', buildCommand(argv, info), (error) => {
-              if (error) {
-                console.error('ERROR:', error)
-              } else {
-                console.info('OK')
-              }
-              end()
-            })
-            break
-          default:
-            console.error('Commande inconnue')
-            end()
-        }
+      parseCommande().catch(() => {}).finally(() => {
+        clearTimeout(id)
+        socket.close()
       })
     ])
   })

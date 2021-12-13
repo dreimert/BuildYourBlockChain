@@ -17,14 +17,17 @@ export class Blockchain {
 
   async addBlock (block, socket) {
     if (!block.isValid()) {
-      log.warn('block invalid')
+      log.warn('block invalid', block)
       return false
-    } else if (this.knownBlocks[block.id]) {
+    } else if (this.knownBlocks[block.id] && !(this.knownBlocks[block.id].then)) {
       return false
     } else {
-      if (block.previous && !this.knownBlocks[block.previous]) {
+      if (!block.previous) {
+        log.warn('On ne peut pas changer le genesis', block)
+        return false
+      } else if (!this.knownBlocks[block.previous]) {
         log.info('previous unknown, download', block.previous)
-        const previous = await new Promise((resolve, reject) => {
+        const previous = new Promise((resolve, reject) => {
           socket.emit('blockById', block.previous, (error, block) => {
             if (error) {
               reject(error)
@@ -33,33 +36,20 @@ export class Blockchain {
             }
           })
         })
-        await this.addBlock(previous, socket)
+        this.knownBlocks[block.previous] = previous
+        await this.addBlock(await previous, socket)
+      } else if (this.knownBlocks[block.previous].then) {
+        await this.knownBlocks[block.previous]
       }
 
       this.knownBlocks[block.id] = block
 
       if (block.verify(this)) {
-        log.warn('verification success')
         if (block.index === this.last().index + 1 && block.previous === this.last().id) {
-          log.info('add block', block)
+          log.info('add block', block.index, block.id)
           this.chain[block.index] = block
-          this.pendingTransactions = this.pendingTransactions.filter((tx) => !block.transactions.find((t) => t.id === tx.id))
           block.transactions.forEach((tx) => {
-            if (tx.type === 'set') {
-              this.db[tx.params.key] = tx.params.value
-            } else if (tx.type === 'identity') {
-              this.identities.push({name: tx.params.name, pub: tx.user})
-              this.identitiesMap[tx.user] = tx.params.name
-            } else if (tx.type === 'reward') {
-              if (this.identitiesMap[tx.user]) {
-                this.rewards[this.identitiesMap[tx.user]] = (this.rewards[this.identitiesMap[tx.user]] || 0) + 1
-              } else {
-                this.rewards['unknown'] = (this.rewards['unknown'] || 0) + 1
-              }
-            }
-            if (!this.knownTransactions[tx.id]) {
-              this.knownTransactions[tx.id] = tx
-            }
+            this.integrateTransaction(tx)
           })
           return true
         } else if (block.index > this.last().index + 1) {
@@ -70,7 +60,7 @@ export class Blockchain {
           return false
         }
       } else {
-        log.warn('verification fail', block)
+        log.warn('fail verification', block)
         return false
       }
     }
@@ -84,35 +74,43 @@ export class Blockchain {
         return [b]
       }
     }
+
     this.chain = _rebuild(block)
     this.identities = []
     this.identitiesMap = {}
     this.rewards = {}
-    this.db = this.chain.reduce((db, block) => {
+    this.db = {}
+
+    this.chain.forEach((block) => {
       block.transactions.forEach((tx) => {
-        if (tx.type === 'set') {
-          db[tx.params.key] = tx.params.value
-        } else if (tx.type === 'identity') {
-          this.identities.push({name: tx.params.name, pub: tx.user})
-          this.identitiesMap[tx.user] = tx.params.name
-        } else if (tx.type === 'reward') {
-          if (this.identitiesMap[tx.user]) {
-            this.rewards[this.identitiesMap[tx.user]] = (this.rewards[this.identitiesMap[tx.user]] || 0) + 1
-          } else {
-            this.rewards['unknown'] = (this.rewards['unknown'] || 0) + 1
-          }
-        }
+        this.integrateTransaction(tx)
       })
-      return db
-    }, {})
-    const toRemove = this.chain.reduce((txs, block) => {
-      return txs.concat(block.transactions)
-    }, [])
-    this.pendingTransactions = this.pendingTransactions.filter((tx) => !toRemove.find((t) => t.id === tx.id))
+    })
   }
 
-  registerBlock (block) {
-    this.knownBlocks[block.id] = block
+  integrateTransaction (tx) {
+    if (!this.knownTransactions[tx.id]) {
+      this.knownTransactions[tx.id] = tx
+    }
+
+    const indexInPending = this.pendingTransactions.findIndex((pt) => pt.id === tx.id)
+
+    if (indexInPending !== -1) {
+      this.pendingTransactions.splice(indexInPending, 1)
+    }
+
+    if (tx.type === 'set') {
+      this.db[tx.params.key] = tx.params.value
+    } else if (tx.type === 'identity') {
+      this.identities.push({ name: tx.params.name, pub: tx.user })
+      this.identitiesMap[tx.user] = tx.params.name
+    } else if (tx.type === 'reward') {
+      if (this.identitiesMap[tx.user]) {
+        this.rewards[this.identitiesMap[tx.user]] = (this.rewards[this.identitiesMap[tx.user]] || 0) + 1
+      } else {
+        this.rewards.unknown = (this.rewards.unknown || 0) + 1
+      }
+    }
   }
 
   addTransaction (tx) {
@@ -132,7 +130,7 @@ export class Blockchain {
   // Vérification locale
   buildNextBlock () {
     const last = this.last()
-    return new Block(last.index + 1, last.id, this.pendingTransactions, Date.now(), last.difficulty)
+    return new Block(last.index + 1, last.id, [...this.pendingTransactions], Date.now(), last.difficulty)
   }
 
   blockByIndex (index) {

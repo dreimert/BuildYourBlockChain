@@ -1,6 +1,7 @@
 import { createHash } from 'crypto'
 
 import Transaction from './Transaction.js'
+import log from './log.js'
 
 class PoW {
   constructor (block) {
@@ -59,6 +60,7 @@ export class Block {
       }
       this.validaded = this.getHash() === this.id && BigInt('0x' + this.id) < this.difficulty && this.difficulty <= BigInt('0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') && this.transactions.reduce((isValid, tx, i) => {
         if (tx.type === 'reward' && i !== 0) {
+          log.warn('Bad reward', this)
           return false
         }
         return isValid && tx.isValid()
