@@ -164,6 +164,16 @@ network.on('keys', function (socket, callback) {
   callback(undefined, blockchain.keys()) // Object.keys() extrait la liste des clefs d'un object et les renvoie sous forme d'un tableau.
 })
 
+network.on('identities', function (socket, callback) {
+  log.info('identities')
+  callback(undefined, blockchain.getIdentities()) // Object.keys() extrait la liste des clefs d'un object et les renvoie sous forme d'un tableau.
+})
+
+network.on('rewards', function (socket, callback) {
+  log.info('rewards')
+  callback(undefined, blockchain.getRewards()) // Object.keys() extrait la liste des clefs d'un object et les renvoie sous forme d'un tableau.
+})
+
 network.on('last', function (socket, callback) {
   log.info('last')
 

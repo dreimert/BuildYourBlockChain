@@ -10,6 +10,9 @@ export class Blockchain {
     }
     this.pendingTransactions = []
     this.knownTransactions = {}
+    this.identities = []
+    this.identitiesMap = {}
+    this.rewards = {}
   }
 
   async addBlock (block, socket) {
@@ -20,7 +23,7 @@ export class Blockchain {
       return false
     } else {
       if (block.previous && !this.knownBlocks[block.previous]) {
-        log.info('previous unknown')
+        log.info('previous unknown, download', block.previous)
         const previous = await new Promise((resolve, reject) => {
           socket.emit('blockById', block.previous, (error, block) => {
             if (error) {
@@ -44,6 +47,15 @@ export class Blockchain {
           block.transactions.forEach((tx) => {
             if (tx.type === 'set') {
               this.db[tx.params.key] = tx.params.value
+            } else if (tx.type === 'identity') {
+              this.identities.push({name: tx.params.name, pub: tx.user})
+              this.identitiesMap[tx.user] = tx.params.name
+            } else if (tx.type === 'reward') {
+              if (this.identitiesMap[tx.user]) {
+                this.rewards[this.identitiesMap[tx.user]] = (this.rewards[this.identitiesMap[tx.user]] || 0) + 1
+              } else {
+                this.rewards['unknown'] = (this.rewards['unknown'] || 0) + 1
+              }
             }
             if (!this.knownTransactions[tx.id]) {
               this.knownTransactions[tx.id] = tx
@@ -73,10 +85,22 @@ export class Blockchain {
       }
     }
     this.chain = _rebuild(block)
+    this.identities = []
+    this.identitiesMap = {}
+    this.rewards = {}
     this.db = this.chain.reduce((db, block) => {
       block.transactions.forEach((tx) => {
         if (tx.type === 'set') {
           db[tx.params.key] = tx.params.value
+        } else if (tx.type === 'identity') {
+          this.identities.push({name: tx.params.name, pub: tx.user})
+          this.identitiesMap[tx.user] = tx.params.name
+        } else if (tx.type === 'reward') {
+          if (this.identitiesMap[tx.user]) {
+            this.rewards[this.identitiesMap[tx.user]] = (this.rewards[this.identitiesMap[tx.user]] || 0) + 1
+          } else {
+            this.rewards['unknown'] = (this.rewards['unknown'] || 0) + 1
+          }
         }
       })
       return db
@@ -129,6 +153,14 @@ export class Blockchain {
 
   keys () {
     return Object.keys(this.db)
+  }
+
+  getIdentities () {
+    return this.identities
+  }
+
+  getRewards () {
+    return this.rewards
   }
 
   // Vérification globale
