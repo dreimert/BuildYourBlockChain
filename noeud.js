@@ -56,6 +56,12 @@ const argv = yargs(hideBin(process.argv))
     default: false,
     description: 'Affiche les logs'
   })
+  .option('debug', {
+    alias: 'd',
+    type: 'boolean',
+    default: false,
+    description: 'Affiche les logs de debug'
+  })
   .version('1.0.0')
   .help()
   .argv
@@ -88,10 +94,15 @@ const blockchain = new Blockchain(genesis)
 // Gestion des options
 if (argv.verbose) {
   log.verbose = true
-  log.info('Mode verbeux')
+  log.log('Mode verbeux')
 }
 
-log.info('My node id:', nodeId)
+if (argv.debug) {
+  log.debug = true
+  log.log('Mode debug')
+}
+
+log.log('My node id:', nodeId)
 
 if (argv.saveOnSigkill) {
   process.on('SIGINT', () => {
@@ -136,8 +147,12 @@ async function setBlock (block, socket, callback = () => {}) {
       network.notifyNeighbors('block', block)
       if (argv.mine) {
         const nextBlock = blockchain.buildNextBlock()
+
         // reward here ;)
         // indice : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift
+
+        log.info(`Search for the hash of block ${nextBlock.index}`)
+
         miner.findPow(nextBlock)
       }
     }

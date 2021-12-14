@@ -165,6 +165,14 @@ export class Blockchain {
   verify (block) {
     return block.verify(this)
   }
+
+  getPreviousAt (block, index) {
+    while (block.index > index) {
+      block = this.knownBlocks[block.previous]
+    }
+
+    return block
+  }
 }
 
 export default Blockchain

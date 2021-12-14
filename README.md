@@ -12,63 +12,63 @@ Vous pouvez accéder à l'aide du *CLI* via `node cli.js` et à celle du noeud v
 
 Le code de `noeud.js` est fonctionnel mais par la suite de ce TP vous devrez le modifier pour ajouter des fonctionnalités.
 
-#### À l'aide des aides, lancer un noeud. Expliquer la procédure.
+#### À l'aide des aides, lancer un nœud. Expliquer la procédure.
 
 ##### Indice : vous **n**'avez **pas** besoin de modifier le code.
 
 ## 2 - À deux (ou plus), c'est mieux !
 
-Toujours sans modifier le code, essayez de lancer deux noeuds en parallèle et de faire en sorte qu'ils communiques.
+Toujours sans modifier le code, essayez de lancer deux nœuds en parallèle et de faire en sorte qu'ils communiquent.
 
-En regardant l'aide du noeud et non celle du *CLI* (l'interprétation de la commande n'est pas codé), lancez les noeuds pour qu'ils minent des blocks. Observez ce qu'il se passe.
+En regardant l'aide du nœud et non celle du *CLI* (l'interprétation de la commande `mine` n'est pas codée dans le serveur), lancez les nœuds pour qu'ils minent des blocs. Observez ce qu'il se passe.
 
-#### Expliquez comment faire pour que les noeuds se synchronisent.
+#### Expliquez comment faire pour que les nœuds se synchronisent.
 
-##### Indice : si le noeud n'est pas assez verbeux, il y a une option pour ça.
+##### Indice : si le nœud n'est pas assez verbeux, il y a une option pour ça.
 
 #### Modifier `noeud.js` pour que la commande `node cli.js mine <state>` fonctionne.
 
 ## 3 - Connectons-nous !
 
-Durant ce TP, j'ai un noeud qui tourne sur https://syd.reimert.fr.
+Durant ce TP, j'ai un nœud qui tourne sur https://syd.reimert.fr.
 
-#### Essayez de vous connecter à mon noeud et de vous synchroniser. Comment avez-vous fait ?
+#### Essayez de vous connecter à mon nœud et de vous synchroniser. Comment avez-vous fait ?
 
 ## 4 - Laisser une trace dans ce monde
 
-En observant le code du noeud, de `cli.js` mais aussi `class/Transaction.js`, modifiez `noeud.js` pour que la commande `node cli.js identity <name>` fonctionne.
+En observant le code du nœud, de `cli.js` mais aussi `class/Transaction.js`, modifiez `noeud.js` pour que la commande `node cli.js identity <name>` fonctionne.
 
-Attention, faites vos tests en local, il serai dommage d'écrire n'importe quoi publiquement ;)
+Attention, faites vos tests en local, il serait dommage d'écrire n'importe quoi publiquement ;)
 
 #### Inscrivez une unique transaction de type `identity` dans la blockchain publique (https://syd.reimert.fr).
 
 ## 5 - Contribuer au réseau
 
-Mon noeud mine des blocks sans demander rétribution mais tout le monde n'est pas aussi généreux.
+Vos nœuds minent des blocks sans demander rétribution mais tout le monde n'est pas aussi généreux. Pire, mon nœud mine des blocks, demande rétribution et refuse vos blocs si vous ne demandez pas de rétribution, quel chacal !
 
-#### Modifiez `noeud.js` pour que votre noeud ajoute une transaction de type `reward` aux blocks qu'il mine.
+#### Modifiez `noeud.js` pour que votre nœud ajoute une transaction de type `reward` aux blocs qu'il mine.
 
-##### Indice : ligne 135 du noeud de base, j'ai même laissé en commentaire un autre indice ;)
+##### Indice : ligne 135 du nœud de base, j'ai même laissé en commentaire un autre indice ;)
 
 ## 6 - Ajuster la difficulté
 
 Vous avez déjà vécu cette sensation que le temps défile trop vite comme moi pour préparer cette étape ? Ou au contraire, qu'il est lent et que ce cours ne va jamais finir ?
 
-Dans la blockchain, la vitesse d'ajout des blocks peut varier avec la modification de la puissance de calcul des participants mais on veut qu'en moyenne il y ai toujours le même temps entre les blocks.
+Dans la blockchain, la vitesse d'ajout des blocs peut varier avec la modification de la puissance de calcul des participants mais on veut qu'en moyenne il y ai toujours le même temps entre les blocs.
 
-Dans notre protocole, je fixe l'objectif à **un block toutes les 10 secondes** et la réévaluation de la difficulté **tous les 60 blocks** soit environ toutes les 10 minutes.
+Dans notre protocole, je fixe l'objectif à **un bloc toutes les 10 secondes** et la réévaluation de la difficulté **tous les 60 blocs** soit environ toutes les 10 minutes. Si c'est trop rapide ou trop lent, divisez ou multipliez par 2.
 
 #### Modifiez `Blockchain.buildNextBlock` et `Block.verify` pour implémenter la réévaluation.
 
-##### Indice : Pour éviter divers problèmes durant le TP, mon noeud public n'implémente pas la réévaluation de la difficulté.
-
 ##### Indice : `100 % 12 === 4`
+
+##### Indice : `100n * 2n`
 
 #### Décrivez les modifications et pourquoi.
 
 ## 7 - Appelez le prof
 
-J'ai pas trop d'idée là. Appelez-mois le jour du TP ;)
+J'ai pas trop d'idées là et si vous arrivez ici félicitation durant le TP ! Appelez-moi ;)
 
 ## Conclusion
 

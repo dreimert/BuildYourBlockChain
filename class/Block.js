@@ -34,7 +34,7 @@ class PoW {
 }
 
 export class Block {
-  constructor (index, previous, transactions, timestamp = Date.now(), difficulty = BigInt('0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'), nonce = 0, id) {
+  constructor (index, previous, transactions, timestamp = Date.now(), difficulty = Block.DefaultDifficulty, nonce = 0, id) {
     // Le mot clé `this` permet d'accèder aux propriétés de l'object depuis ses méthodes.
     this.index = index
     this.previous = previous
@@ -58,7 +58,7 @@ export class Block {
         this.validaded = false
         return false
       }
-      this.validaded = this.getHash() === this.id && BigInt('0x' + this.id) < this.difficulty && this.difficulty <= BigInt('0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff') && this.transactions.reduce((isValid, tx, i) => {
+      this.validaded = this.getHash() === this.id && BigInt('0x' + this.id) < this.difficulty && this.difficulty <= Block.MinimumDifficulty && this.transactions.reduce((isValid, tx, i) => {
         if (tx.type === 'reward' && i !== 0) {
           log.warn('Bad reward', this)
           return false
@@ -70,33 +70,36 @@ export class Block {
     return this.validaded
   }
 
-  // Vérification globale
-  verify (blockchain) {
-    if (this.verified === undefined) {
-      if (!this.isValid()) {
-        this.verified = false
+  _verify (blockchain) {
+    if (!this.isValid()) {
+      log.debug('_verify::isValid:false')
+      return false
+    }
+
+    for (let i = 0; i < this.transactions.length; i++) {
+      if (!this.transactions[i].verify(blockchain)) {
+        log.debug('_verify::transactions:transaction invalid')
+        return false
+      }
+    }
+
+    if (this.previous) {
+      const previous = blockchain.knownBlocks[this.previous]
+
+      if (!previous || previous.index + 1 !== this.index || this.timestamp < previous.timestamp || !previous.verify(blockchain)) {
+        log.debug('_verify::previous:oups')
         return false
       }
 
-      for (let i = 0; i < this.transactions.length; i++) {
-        if (!this.transactions[i].verify(blockchain)) {
-          this.verified = false
-          return false
-        }
-      }
+    }
 
-      if (this.previous) {
-        const previous = blockchain.knownBlocks[this.previous]
+    return true
+  }
 
-        if (!previous || previous.index + 1 !== this.index || this.timestamp < previous.timestamp || !previous.verify(blockchain)) {
-          this.verified = false
-          return false
-        }
-
-        this.verified = true
-      } else {
-        this.verified = true
-      }
+  // Vérification globale
+  verify (blockchain) {
+    if (this.verified === undefined) {
+      this.verified = this._verify(blockchain)
     }
 
     return this.verified
@@ -148,6 +151,14 @@ export class Block {
   static fromObject (object) {
     const { index, previous, transactions, timestamp, difficulty, nonce, id } = object
     return new Block(index, previous, transactions.map((tx) => Transaction.fromObject(tx)), timestamp, BigInt(difficulty), nonce, id)
+  }
+
+  static get DefaultDifficulty () {
+    return BigInt('0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+  }
+
+  static get MinimumDifficulty () {
+    return BigInt('0x000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
   }
 }
 
