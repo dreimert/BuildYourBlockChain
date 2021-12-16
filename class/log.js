@@ -29,7 +29,7 @@ class Log {
 
   // s'affiche toujouts dans la sortie d'erreur
   error (...params) {
-    console.error(...params)
+    console.error('## ERREUR ##', ...params)
   }
 }
 
