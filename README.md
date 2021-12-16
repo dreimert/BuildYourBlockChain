@@ -36,13 +36,19 @@ Durant ce TP, j'ai un nœud qui tourne sur https://syd.reimert.fr.
 
 #### Essayez de vous connecter à mon nœud et de vous synchroniser. Comment avez-vous fait ?
 
+##### Indice : mon noeud tourne sur le port 443.
+
 ## 4 - Laisser une trace dans ce monde
 
-En observant le code du nœud, de `cli.js` mais aussi `class/Transaction.js`, modifiez `noeud.js` pour que la commande `node cli.js identity <name>` fonctionne.
+La transaction `identity` sert à associer votre clé publique à votre nom.
+
+En observant le code du nœud, notamment la commande `set`, de `cli.js` mais aussi `class/Transaction.js`, modifiez `noeud.js` pour que la commande `node cli.js identity <name>` fonctionne.
 
 Attention, faites vos tests en local, il serait dommage d'écrire n'importe quoi publiquement ;)
 
 #### Inscrivez une unique transaction de type `identity` dans la blockchain publique (https://syd.reimert.fr).
+
+##### Indice : pour vérifier le fonctionnement, vous pouvez utiliser la commande `identities` du *CLI*.
 
 ## 5 - Contribuer au réseau
 
