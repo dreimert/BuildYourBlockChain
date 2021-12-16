@@ -26,7 +26,7 @@ export class Blockchain {
         log.warn('On ne peut pas changer le genesis', block)
         return false
       } else if (!this.knownBlocks[block.previous]) {
-        log.info('previous unknown, download', block.previous)
+        log.info('previous unknown, download', block.index - 1, block.previous)
         const previous = new Promise((resolve, reject) => {
           socket.emit('blockById', block.previous, (error, block) => {
             if (error) {
@@ -36,11 +36,14 @@ export class Blockchain {
             }
           })
         })
+
         this.knownBlocks[block.previous] = previous
-        await this.addBlock(await previous, socket)
+        this.knownBlocks[block.previous] = this.addBlock(await previous, socket)
       } else if (this.knownBlocks[block.previous].then) {
         await this.knownBlocks[block.previous]
       }
+
+      await this.knownBlocks[block.previous]
 
       this.knownBlocks[block.id] = block
 
@@ -51,11 +54,11 @@ export class Blockchain {
           block.transactions.forEach((tx) => {
             this.integrateTransaction(tx)
           })
-          return true
+          return block
         } else if (block.index > this.last().index + 1) {
           log.info('rebuild chain from', block)
           this.rebuild(block)
-          return true
+          return block
         } else {
           return false
         }

@@ -87,7 +87,7 @@ export class Block {
       const previous = blockchain.knownBlocks[this.previous]
 
       if (!previous || previous.index + 1 !== this.index || this.timestamp < previous.timestamp || !previous.verify(blockchain)) {
-        log.debug('_verify::previous:oups')
+        log.debug('_verify::previous:oups', this, previous)
         return false
       }
     }
