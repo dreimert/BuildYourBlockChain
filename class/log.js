@@ -23,7 +23,7 @@ class Log {
 
   warn (...params) {
     if (this.verbose) {
-      console.warn(...params)
+      console.warn('## WARN ##', ...params)
     }
   }
 

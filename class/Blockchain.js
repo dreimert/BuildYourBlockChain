@@ -23,7 +23,7 @@ export class Blockchain {
       return false
     } else {
       if (!block.previous) {
-        log.warn('On ne peut pas changer le genesis', block)
+        log.error('On ne peut pas changer le genesis', block)
         return false
       } else if (!this.knownBlocks[block.previous]) {
         log.info('previous unknown, download', block.index - 1, block.previous)
