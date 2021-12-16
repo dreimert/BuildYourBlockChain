@@ -56,7 +56,9 @@ Vos nœuds minent des blocks sans demander rétribution mais tout le monde n'est
 
 #### Modifiez `noeud.js` pour que votre nœud ajoute une transaction de type `reward` aux blocs qu'il mine.
 
-##### Indice : ligne 135 du nœud de base, j'ai même laissé en commentaire un autre indice ;)
+##### Indice : ligne 152 du nœud de base, j'ai même laissé en commentaire des indices ;)
+
+##### Indice : le reward doit être la première transaction du block :)
 
 ## 6 - Ajuster la difficulté
 

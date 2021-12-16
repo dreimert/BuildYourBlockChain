@@ -37,7 +37,7 @@ const argv = yargs(hideBin(process.argv))
   })
   .option('bootstrap', {
     alias: 'b',
-    description: 'Initialise la blockchain avec ce timestamp',
+    description: 'Initialise le genesis de la blockchain avec ce timestamp',
     type: 'number'
   })
   .option('saveOnSig', {
@@ -150,6 +150,7 @@ async function setBlock (block, socket, callback = () => {}) {
 
         // reward here ;)
         // indice : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift
+        // indice : pour créer une transaction, vous pouvez regarder comment cli.js crée une command
 
         log.info(`Search for the hash of block ${nextBlock.index}`)
 
@@ -161,10 +162,10 @@ async function setBlock (block, socket, callback = () => {}) {
   }
 }
 
-// ajout des blocks minés
+// # ajout des blocks minés
 miner.on('pow', setBlock)
 
-// gestion des demandes en lecture
+// # gestion des demandes en lecture
 network.on('get', function (socket, key, callback) {
   const value = blockchain.get(key)
   if (value !== undefined) {
@@ -210,7 +211,7 @@ network.on('blockById', function (socket, id, callback) {
   callback(undefined, blockchain.blockById(id))
 })
 
-// notifications
+// # notifications
 network.on('transaction', function (socket, transaction, callback) {
   log.info('transaction', transaction.id)
 
@@ -240,7 +241,7 @@ network.on('block', function (socket, block, callback) {
   setBlock(block, socket, callback)
 })
 
-// gestion des commandes authentifiées
+// # gestion des commandes authentifiées
 network.on('cmd', function (socket, cmd, callback) {
   cmd = Command.fromObject(cmd)
 

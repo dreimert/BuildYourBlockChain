@@ -56,11 +56,12 @@ export class Block {
     if (this.validaded === undefined) {
       if (this.index === 0 && this.previous !== null) {
         this.validaded = false
+        log.debug('Block::isValid:index 0 and previous !== null', this)
         return false
       }
       this.validaded = this.getHash() === this.id && BigInt('0x' + this.id) < this.difficulty && this.difficulty <= Block.MinimumDifficulty && this.transactions.reduce((isValid, tx, i) => {
         if (tx.type === 'reward' && i !== 0) {
-          log.warn('Bad reward', this)
+          log.debug('Block::isValid:reward isnt at index 0', this)
           return false
         }
         return isValid && tx.isValid()
