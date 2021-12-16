@@ -56,7 +56,9 @@ Vous avez déjà vécu cette sensation que le temps défile trop vite comme moi 
 
 Dans la blockchain, la vitesse d'ajout des blocs peut varier avec la modification de la puissance de calcul des participants mais on veut qu'en moyenne il y ai toujours le même temps entre les blocs.
 
-Dans notre protocole, je fixe l'objectif à **un bloc toutes les 10 secondes** et la réévaluation de la difficulté **tous les 60 blocs** soit environ toutes les 10 minutes. Si c'est trop rapide ou trop lent, divisez ou multipliez par 2.
+Dans notre protocole, je fixe l'objectif à **un bloc toutes les 10 secondes** et la réévaluation de la difficulté **tous les 60 blocs** soit environ toutes les 10 minutes. Si c'est trop rapide ou trop lent, modifier la difficulté en fonction.
+
+J'utilise la formule suivante : `const nextDifficulty = previousDifficulty * BigInt(Math.floor(moyenne)) / 10000n`.
 
 #### Modifiez `Blockchain.buildNextBlock` et `Block.verify` pour implémenter la réévaluation.
 

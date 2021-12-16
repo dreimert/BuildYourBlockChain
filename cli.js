@@ -148,7 +148,11 @@ function sendCommand (argv) {
     }
   }
 
-  const socket = io(`${argv.url}:${argv.port}`, {
+  const url = `${argv.url}:${argv.port}`
+
+  info(`Connection à ${url}`)
+
+  const socket = io(url, {
     path: '/byc',
     timeout: 5000,
     reconnection: false,

@@ -154,11 +154,11 @@ export class Block {
   }
 
   static get DefaultDifficulty () {
-    return BigInt('0x0000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+    return BigInt('0x000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
   }
 
   static get MinimumDifficulty () {
-    return BigInt('0x000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
+    return BigInt('0x00fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
   }
 }
 
