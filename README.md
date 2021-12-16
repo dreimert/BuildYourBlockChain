@@ -26,6 +26,8 @@ En regardant l'aide du nœud et non celle du *CLI* (l'interprétation de la comm
 
 ##### Indice : si le nœud n'est pas assez verbeux, il y a une option pour ça.
 
+##### Indice : Pour vérifier que les noeuds sont synchronisés, comparer le résultat des commandes `last` sur les deux noeuds, notamment les timestamps.
+
 #### Modifier `noeud.js` pour que la commande `node cli.js mine <state>` fonctionne.
 
 ## 3 - Connectons-nous !
