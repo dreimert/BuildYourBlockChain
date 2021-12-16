@@ -10,7 +10,7 @@ import { generateKeyPairSync } from 'crypto'
 import Command from './class/Command.js'
 
 yargs(hideBin(process.argv)) // Analyse des paramètres
-  .command('create', 'Crée un couple de clés', () => {}, create)
+  .command('create', 'Crée un couple de clés (un wallet)', () => {}, create)
   .command('get <key>', 'Récupère la valeur associé à la clé', () => {}, sendCommand)
   .command('set <key> <value> [timestamp]', 'Place une association clé / valeur', () => {}, sendCommand)
   .command('keys', 'Demande la liste des clés', () => {}, sendCommand)
