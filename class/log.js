@@ -1,11 +1,11 @@
 class Log {
   constructor () {
     this.verbose = false
-    this.debug = false
+    this.debuging = false
   }
 
   debug (...params) {
-    if (this.debug) {
+    if (this.debuging) {
       console.log(...params)
     }
   }

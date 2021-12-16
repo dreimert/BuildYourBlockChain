@@ -98,7 +98,7 @@ if (argv.verbose) {
 }
 
 if (argv.debug) {
-  log.debug = true
+  log.debuging = true
   log.log('Mode debug')
 }
 

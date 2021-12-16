@@ -90,7 +90,6 @@ export class Block {
         log.debug('_verify::previous:oups')
         return false
       }
-
     }
 
     return true
