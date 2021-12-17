@@ -17,7 +17,7 @@ yargs(hideBin(process.argv)) // Analyse des paramètres
   .command('identities', 'Demande la liste des identitées', () => {}, sendCommand)
   .command('rewards', 'Demande la liste des rewards', () => {}, sendCommand)
   .command('peers', 'Demande la liste des pairs du noeud', () => {}, sendCommand)
-  .command('addPeer <peerUrl>', 'Ajoute un nouveau noeud voisin', (yargs) => {
+  .command('addPeer <portOrPeerUrl>', 'Ajoute un nouveau noeud voisin', (yargs) => {
     return yargs.option('force', {
       alias: 'f',
       default: false,
@@ -121,13 +121,13 @@ function buildCommand (argv, info) {
 
     params = { state: argv.state }
   } else if (argv._[0] === 'addPeer') {
-    info(`addPeer ${argv.peerUrl} =>`)
+    info(`addPeer ${argv.portOrPeerUrl} =>`)
 
-    if (parseInt(argv.peerUrl)) {
-      argv.peerUrl = 'http://localhost:' + parseInt(argv.peerUrl)
+    if (parseInt(argv.portOrPeerUrl)) {
+      argv.portOrPeerUrl = 'http://localhost:' + parseInt(argv.portOrPeerUrl)
     }
 
-    params = { url: argv.peerUrl, force: argv.force }
+    params = { url: argv.portOrPeerUrl, force: argv.force }
   } else if (argv._[0] === 'identity') {
     info(`identity ${argv.name} =>`)
 
