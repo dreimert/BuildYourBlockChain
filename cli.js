@@ -17,14 +17,14 @@ yargs(hideBin(process.argv)) // Analyse des paramètres
   .command('identities', 'Demande la liste des identitées', () => {}, sendCommand)
   .command('rewards', 'Demande la liste des rewards', () => {}, sendCommand)
   .command('peers', 'Demande la liste des pairs du noeud', () => {}, sendCommand)
-  .command('addPeer <portOrPeerUrl>', 'Ajoute un nouveau noeud voisin', (yargs) => {
+  .command('addPeer <portOrPeerUrl>', 'Ajoute un nouveau noeud voisin. Authentification requise.', (yargs) => {
     return yargs.option('force', {
       alias: 'f',
       default: false,
       type: 'boolean'
     })
   }, sendCommand)
-  .command('mine <state>', 'active ou désactive le minage', (yargs) => {
+  .command('mine <state>', 'active ou désactive le minage. Authentification requise.', (yargs) => {
     yargs.positional('state', {
       choices: ['start', 'stop']
     })
@@ -32,7 +32,7 @@ yargs(hideBin(process.argv)) // Analyse des paramètres
   .command('last', 'Affiche le dernier block', () => {}, sendCommand)
   .command('blockById <id>', 'Affiche le block d\'id indiquée', () => {}, sendCommand)
   .command('blockByIndex <index>', 'Affiche le block à l\'index indiqué', () => {}, sendCommand)
-  .command('identity <name>', 'Envoie une commande identity', () => {}, sendCommand)
+  .command('identity <name>', 'Envoie une commande identity. Authentification requise.', () => {}, sendCommand)
   .version('2.0.0')
   .option('url', {
     alias: 'u',

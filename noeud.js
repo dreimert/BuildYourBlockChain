@@ -91,6 +91,8 @@ const network = new Network(argv.port, argv.url, nodeId)
 const miner = new Miner()
 const blockchain = new Blockchain(genesis)
 
+let mining = false
+
 // Gestion des options
 if (argv.verbose) {
   log.verbose = true
@@ -133,6 +135,7 @@ if (argv.autoSave) {
 }
 
 if (argv.mine) {
+  mining = true
   log.info('Minage activé')
   miner.findPow(blockchain.buildNextBlock())
 }
@@ -145,10 +148,11 @@ async function setBlock (block, socket, callback = () => {}) {
   } else {
     if (await blockchain.addBlock(block, socket)) {
       network.notifyNeighbors('block', block)
-      if (argv.mine) {
+      if (mining) {
         const nextBlock = blockchain.buildNextBlock()
 
         // reward here ;)
+        // nextBlock.transactions.unshift(new Transaction())
         // indice : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift
         // indice : pour créer une transaction, vous pouvez regarder comment cli.js crée une command
 
@@ -273,6 +277,14 @@ network.on('cmd', function (socket, cmd, callback) {
         setBlock(Block.fromObject(last), s, callback)
       })
     }
+  } else if (cmd.type === 'mine') {
+    log.info('cmd::mine', cmd.params)
+    const error = new Error('mine error : not implemented')
+    callback(error.message)
+  } else if (cmd.type === 'identity') {
+    log.info('cmd::identity', cmd.params)
+    const error = new Error('identity error : not implemented')
+    callback(error.message)
   } else {
     const error = new Error('cmd error : type inconnue')
     log.info(error)

@@ -24,9 +24,15 @@ En regardant l'aide du nœud et non celle du *CLI* (l'interprétation de la comm
 
 #### Expliquez comment faire pour que les nœuds se synchronisent.
 
-##### Indice : si le nœud n'est pas assez verbeux, il y a une option pour ça.
+##### Indice : vous **n**'avez **pas** besoin de modifier le code.
 
 ##### Indice : Pour vérifier que les noeuds sont synchronisés, comparer le résultat des commandes `blockByIndex` sur les deux noeuds, notamment les timestamps.
+
+##### Indice : si le nœud n'est pas assez verbeux, il y a une option pour ça. Mais parfois trop d'informations noie l'information ;)
+
+### 2.1 - Prendre le controle
+
+#### Essayer la commande `mine <state>` du *CLI*.
 
 #### Modifier `noeud.js` pour que la commande `node cli.js mine <state>` fonctionne.
 
