@@ -63,6 +63,10 @@ Les buts de cette étape sont :
 * Comprendre les bases de socket.io.
 * Comprendre le fonctionnement d'une base de données minimaliste.
 
+## Durée
+
+Cette étape dure entre 10 et 30 min selon votre familiarité avec Javascript. Si vous dépassez les 30 min appeler l'enseignant pour vous débloquer.
+
 ## Une base de données minimaliste
 
 J'ai réalisé pour vous un serveur de base de données minimaliste. Pour l'exécuter, taper la commande : `node serveur.js`.
