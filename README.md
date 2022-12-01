@@ -24,6 +24,8 @@ Vous êtes sur votre machine perso ? Tout se passe là : https://nodejs.org/
 
 ## Installation de node si vous êtes sur les postes de l'INSA
 
+Attention ! Vous devez faire cette manipulation dans un répertoire non virtuel. Par exemple dans votre home. Si vous le faite dans HOME_INSA ou sur le bureau, ça ne fonctionnera pas.
+
 Télécharger les binaires et les décompresser :
 
     wget https://nodejs.org/dist/v16.13.0/node-v16.13.0-linux-x64.tar.xz
