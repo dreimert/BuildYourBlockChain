@@ -66,9 +66,9 @@ myArray.push(maVariable);
 
 #### Vérifiez le bon fonctionnement avec la commande `peers`.
 
-Les deux commandes semblent fonctionner ? Parfait, le comportement actuel de `addPeers` correspond au fonctionnement d'une autre fonction : `auth`. `auth` permet à un serveur de s'identifier comme voisin à un autre serveur. Nous verrons plus tard son utilisation
+Les deux commandes semblent fonctionner ? Parfait, le comportement actuel de `addPeer` correspond au fonctionnement d'une autre fonction : `auth`. `auth` permet à un serveur de s'identifier comme voisin à un autre serveur. Nous verrons plus tard son utilisation
 
-#### Copier la version actuelle de `addPeers` et renommer la copie `auth`.
+#### Copier la version actuelle de `addPeer` et renommer la copie `auth`.
 
 Il faut maintenant que les nœuds communiquent entre eux.
 
