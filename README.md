@@ -7,7 +7,7 @@ Les buts de cette étape sont :
 * Transformer notre base de données client / serveur en une base distribuée.
 * Comprendre les problèmes liés aux systèmes distribués.
 
-## Confiance et défaillance
+## Confiance et défaillance (5 à 15 min)
 
 Dans l'approche par client / serveur, vous devez avoir confiance dans le serveur :
 
@@ -32,7 +32,7 @@ Il faut pouvoir lancer le nœud plusieurs fois avec des configurations différen
 
 Vous êtes maintenant en mesure de lancer plusieurs nœuds en parallèle mais ils ne se voient pas et ne se synchronisent pas.
 
-## Jouer avec des inconnus
+## Jouer avec des inconnus (20 à 45 min)
 
 Il faut maintenant faire en sorte que nos nœuds se voient et se parlent. Pour cela, il faut savoir comment les contacter. Dans Bitcoin et dans un système distribué plus généralement, on peut ajouter un nœud à tout moment et sans le connaitre.
 
@@ -98,7 +98,7 @@ Est-ce que le nœud ajouté indique bien une nouvelle connexion ? Oui ? Cool ! P
 
 ##### Indice 2 : pour émettre une commande, regardez comment le *CLI* fait.
 
-## Appariement et synchronisation
+## Appariement et synchronisation (20 à 45 min)
 
 Nos nœuds doivent maintenant échanger des informations. Vous allez essayer de mettre en place 3 nœuds qui communiquent entre eux et se synchronisent. Par exemple, supposons que vous utilisez les ports 3000, 3001 et 3002.
 
@@ -142,7 +142,7 @@ Imaginez trois amis qui essayent de maintenir une connaissance commune du statut
 
 Nous verrons comment résoudre ces difficultés à l'étape suivant.
 
-## Synchronisation initiale
+## Synchronisation initiale (10 à 30 min)
 
 Lancez deux nœuds et connectez-les. Ajoutez quelques valeurs. Lancez maintenant un troisième nœud et connectez-le aux deux autres.
 
@@ -152,7 +152,7 @@ Lancez deux nœuds et connectez-les. Ajoutez quelques valeurs. Lancez maintenant
 
 #### Modifier la commande `auth` et `addPeer` pour qu'à chaque nouvelle connexion entre serveur, la **fonction** `sync` soit appelée.
 
-## Réseauter
+## Réseauter (5 min)
 
 Construire un réseau de nœuds est pénible ? J'ai un outil pour vous !
 
@@ -176,7 +176,7 @@ Les logs et les erreurs sont redirigés dans des fichiers de la forme `id.log` e
 
 Grâce à cet outil, j'ai écrit le scénario de la synchronisation initiale. Il est dans `scenarios/sync.js`. Pour l'exécuter : `node scenarios/sync.js`.
 
-## Vérifier que tout fonctionne
+## Vérifier que tout fonctionne (5 min)
 
 Lancez `npm test`.
 
