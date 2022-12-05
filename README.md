@@ -81,10 +81,10 @@ Le problème d'une panne réseau est que le nœud ne reçoit pas la mise à jour
 
 Vous pouvez voir une illustration en lançant la commande `node scenarios/panne.js`.
 
-Actuellement, la commande `keys` ne retourne que la liste des clés mais pas l'horodatage. Avec celle-ci, on ne peut pas savoir si une clé a changé. Le code suivant permet d'extraire uniquement le champ *date* de chaque clé de la base de données.
+Actuellement, la commande `keys` ne retourne que la liste des clés mais pas l'horodatage. Avec celle-ci, on ne peut pas savoir si une clé a changé. Le code suivant permet d'extraire le champ *date* de chaque clé de la base de données et de construire un dictionnaire.
 
 ```Javascript
-const extractHorodatage = function(db) {
+function extractHorodatage (db) {
   return Object.keys(db).reduce(function(result, key) {
     result[key] = {
       date: db[key].date
@@ -96,9 +96,9 @@ const extractHorodatage = function(db) {
 // retourne : {a: {date: 123456789}}
 ```
 
-#### Écrivez une commande `keysAndTime` qui retourne la liste des clés avec l'horodatage.
+#### Écrivez une commande `keysAndTime` qui retourne un dictionnaire des clés avec l'horodatage.
 
-Il ne reste plus qu'à appeler la commande la commande `keysAndTime` à la place de `keys` à la synchronisation pour détecter une désynchronisation et la corriger. Quand vous corrigez la valeur, informez vos voisins qui sont peut-être aussi désynchronisés.
+Il ne reste plus qu'à appeler la commande la commande `keysAndTime` à la place de `keys` à la synchronisation pour détecter une désynchronisation et la corriger. Quand vous corrigez la valeur, informez vos voisins qui sont peut-être aussi désynchronisés. Attention, ce n'est plus un tableau mais un dictionnaire. Cf. indice ;)
 
 #### Mettez en place la mécanique de détection et de correction.
 
