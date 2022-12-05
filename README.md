@@ -29,10 +29,6 @@ L'information se propage de proche en proche jusqu'à confrontation. Un partie d
 
 #### Imaginez des solutions possibles. Notez-les, on pourra s'en servir plus tard.
 
-#### Lancez la commande `node scenarios/latence.js`.
-
-Si vous voulez voir plus en détails ce qu'il se passe, vous pouvez ajouter l'option `-v`. C'est valable pour tous les scénarios.
-
 ## Combattre le temps par le temps
 
 Dans l'idée initiale, on ne peut pas mettre à jour une valeur. Partant de cette idée, il semble cohérent que la valeur la plus vieille soit la bonne. Je vous propose donc l'algorithme de consensus suivant : on garde la valeur la plus vieille.
@@ -58,6 +54,10 @@ socket.on('set', function(field, value, callback) {
 J'ai modifier le *CLI* pour qu'il supporte un troisième paramètre optionnel à la commande `set`.
 
 #### Modifiez la commande `set` dans `serveur.js` pour qu'elle supporte une valeur simple ou un objet.
+
+#### Lancez la commande `node scenarios/latence.js`.
+
+Si vous voulez voir plus en détails ce qu'il se passe, vous pouvez ajouter l'option `-v`. C'est valable pour tous les scénarios.
 
 #### Modifiez la manière dont la commande `set` traite les clefs déjà définies pour garder la plus vieille.
 
