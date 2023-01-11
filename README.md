@@ -74,19 +74,19 @@ Dans la blockchain, la vitesse d'ajout des blocs peut varier avec la modificatio
 
 Dans notre protocole, je fixe l'objectif à **un bloc toutes les 10 secondes** et la réévaluation de la difficulté **tous les 60 blocs** soit environ toutes les 10 minutes. Si c'est trop rapide ou trop lent, modifier la difficulté en fonction.
 
-J'utilise la formule suivante : `const nextDifficulty = previousDifficulty * BigInt(Math.floor(moyenne)) / 10000n`.
+J'utilise la formule suivante : `const nextDifficulty = previousDifficulty * BigInt(Math.floor(moyenne)) / 10000n` où `moyenne` est le temps moyen par block depuis la dernière réévaluation en millisecondes et `10000n` correspond à 10 secondes en millisecondes.
 
 #### Modifiez `Blockchain.buildNextBlock` et `Block.verify` pour implémenter la réévaluation.
 
-##### Indice : `100 % 12 === 4`
+##### Indice : le modulo est fort util. Exemple : `100 % 12 === 0`
 
-##### Indice : `100n * 2n`
+##### Indice : pour manipuler des BigInt, il faut rajouter un n. Exemple : `100n * 2n`
 
 #### Décrivez les modifications et pourquoi.
 
 ## 7 - Appelez le prof
 
-J'ai pas trop d'idées là et si vous arrivez ici félicitation durant le TP ! Appelez-moi ;)
+J'ai pas trop d'idées là et si vous arrivez ici durant le TP, félicitation ! Appelez-moi ;)
 
 ## Conclusion
 
