@@ -152,7 +152,9 @@ async function setBlock (block, socket, callback = () => {}) {
         const nextBlock = blockchain.buildNextBlock()
 
         // reward here ;)
-        // nextBlock.transactions.unshift(new Transaction())
+        // const tx = new Transaction(...)
+        // ...
+        // nextBlock.transactions.unshift(tx)
         // indice : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Global_Objects/Array/unshift
         // indice : pour créer une transaction, vous pouvez regarder comment cli.js crée une command
 
