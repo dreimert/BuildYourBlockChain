@@ -39,6 +39,7 @@ export class Block {
     this.index = index
     this.previous = previous
     this.transactions = transactions
+    this.txHash = createHash('sha256').update(this.transactions}.toString(), 'utf8').digest('hex')
     this.timestamp = timestamp
     this.difficulty = difficulty
     this.nonce = nonce
@@ -48,7 +49,7 @@ export class Block {
 
   // Retourne l'identifiant du block en le calculant depuis les données
   getHash () {
-    return createHash('sha256').update(`${this.index}${this.previous}${this.transactions}${this.timestamp}${this.difficulty}${this.nonce}`, 'utf8').digest('hex')
+    return createHash('sha256').update(`${this.index}${this.previous}${this.txHash}${this.timestamp}${this.difficulty}${this.nonce}`, 'utf8').digest('hex')
   }
 
   // Vérification locale
