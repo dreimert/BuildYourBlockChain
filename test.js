@@ -25,13 +25,13 @@ function execCommande (cmd, t) {
 
 test('Vérification de la version de node', function (t) {
   return execCommande('node --version', t).then(({ stdout, stderr }) => {
-    t.ok(parseInt(stdout.split('.')[0].split('v')[1]) >= 16, 'Version de node supérieure ou équale à 16')
+    t.ok(parseInt(stdout.split('.')[0].split('v')[1]) >= 16, 'Version de node supérieure ou equal à 16')
   })
 })
 
 test('Vérification de la version', function (t) {
   return execCommande('node ./serveur.js --version', t).then(({ stdout, stderr }) => {
-    t.equal(stdout, '1.0.0\n', 'Numero de version')
+    t.equal(stdout, '1.0.0\n', 'Numéro de version')
   })
 })
 
