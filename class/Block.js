@@ -10,10 +10,10 @@ class PoW {
       this.reject = reject
     })
 
-    this.run(block)
+    this._run(block)
   }
 
-  async run (block) {
+  async _run (block) {
     this.run = true
     this.block = block
 
@@ -39,7 +39,7 @@ export class Block {
     this.index = index
     this.previous = previous
     this.transactions = transactions
-    this.txHash = createHash('sha256').update(this.transactions}.toString(), 'utf8').digest('hex')
+    this.txHash = createHash('sha256').update(this.transactions.toString(), 'utf8').digest('hex')
     this.timestamp = timestamp
     this.difficulty = difficulty
     this.nonce = nonce
@@ -136,7 +136,7 @@ export class Block {
 
         return resolve(false)
       })
-    }, 0)
+    })
   }
 
   toJSON () {
