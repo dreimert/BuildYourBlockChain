@@ -7,10 +7,10 @@ import EventEmitter from 'events'
 import log from './log.js'
 
 export class Network extends EventEmitter {
-  constructor (port = 3000, url = 'http://localhost' + port, nodeId) {
+  constructor (port = 3000, url = 'http://localhost', nodeId) {
     super()
     this.port = port
-    this.url = url
+    this.url = url + ':' + port
     this.nodeId = nodeId
     this.neighbors = []
     this.sockets = []
