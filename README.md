@@ -91,6 +91,8 @@ Le fichier de test `test.js` va nous permettre de tester notre serveur de base d
 
 #### Lancez les tests. Un test ne doit pas fonctionner. Corrigez le serveur pour que toutes les commandes fonctionnent et respectent le protocole.
 
+##### Indice : db[field].value
+
 ## Socket.io
 
 Pour gagner du temps, j'utilise *socket.io* qui me permet d'établir une connexion entre le serveur et le client. Vous pouvez trouver la documentation là : https://socket.io/.
