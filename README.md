@@ -2,7 +2,7 @@
 
 Le but de ce tutoriel est de coder une blockchain depuis un exemple simple de base de données pour en comprendre les mécanismes. Cette blockchain sera très loin d'une blockchain de production mais permettra d'illustrer les différentes mécaniques la constituant. Les notions et les problématiques seront introduites au fur et à mesure de la progression. Certaines seront *un peu* simplifiées.
 
-Le code se fait en Javascript pour permettre au plus grand nombre de réaliser ce tutoriel et parce que c'est le langage de programmation que j'utilise quotidiennement :D. L'environnement utilisé pour l'écriture de ce sujet est Node.js (https://nodejs.org/fr/) en version 16 avec `npm` pour gérer les dépendances.
+Le code se fait en Javascript pour permettre au plus grand nombre de réaliser ce tutoriel et parce que c'est le langage de programmation que j'utilise quotidiennement :D. L'environnement utilisé pour l'écriture de ce sujet est Node.js (https://nodejs.org/fr/) en version 18 minimum avec `npm` pour gérer les dépendances.
 
 Ce tutoriel est la cinquième itération, vous pouvez trouver la quatrième là : https://github.com/dreimert/BuildYourChain.
 
