@@ -75,8 +75,8 @@ J'ai réalisé pour vous un serveur de base de données minimaliste. Pour l'exé
 
 Le serveur de la base de données n'accepte que trois commandes : `get`, `set` et `keys` :
 
-* get : permet de récupérer la valeur d'une clé. Si la clé n'existe pas, retourne une erreur.
-* set : permet d'associer une valeur à une clé, une fois une valeur associée à une clé, **il n'est plus possible de modifier la valeur**. Si la clé n'existe pas, la valeur est affectée à la clé. Si la clé existe, elle n'est pas modifiée et dans le cas où la valeur est identique, la commande ne retourne pas d'erreur et se résout normalement sinon la commande retourne une erreur `set error : Field ${field} exists.`.
+* get : permet de récupérer la valeur d'une clé. Si la clé n'existe pas dans la base de données, retourne une erreur.
+* set : permet d'associer une valeur à une clé, une fois une valeur associée à une clé, **il n'est plus possible de modifier la valeur**. Si la clé n'existe pas dans la base de données, la valeur est affectée à la clé. Si la clé existe, elle n'est pas modifiée et dans le cas où la valeur est identique, la commande ne retourne pas d'erreur et se résout normalement sinon la commande retourne une erreur `set error : Field ${field} exists.`.
 * keys : retourne la liste des clés de la base de données.
 
 J'ai codé un *CLI* (Command Line Interface) pour passer des commandes au serveur. Pour voir les commandes que le *CLI* peut lancer : `node cli.js`.
