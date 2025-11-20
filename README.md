@@ -48,7 +48,7 @@ Durant ce TP, j'ai un nœud qui tourne sur https://syd.reimert.fr.
 
 La transaction `identity` sert à associer votre clé publique à votre nom.
 
-En observant le code du nœud, notamment la commande `set`, de `cli.js` mais aussi `class/Transaction.js`, modifiez `noeud.js` pour que la commande `node cli.js identity <name>` fonctionne.
+En observant le code du nœud, notamment la commande `set` mais aussi `class/Transaction.js`, modifiez `noeud.js` pour que la commande `node cli.js identity <name>` fonctionne.
 
 Attention, faites vos tests en local, il serait dommage d'écrire n'importe quoi publiquement ;)
 
