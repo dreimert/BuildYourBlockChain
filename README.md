@@ -2,43 +2,15 @@
 
 Le but de ce tutoriel est de coder une blockchain depuis un exemple simple de base de données pour en comprendre les mécanismes. Cette blockchain sera très loin d'une blockchain de production mais permettra d'illustrer les différentes mécaniques la constituant. Les notions et les problématiques seront introduites au fur et à mesure de la progression. Certaines seront *un peu* simplifiées.
 
-Le code se fait en Javascript pour permettre au plus grand nombre de réaliser ce tutoriel et parce que c'est le langage de programmation que j'utilise quotidiennement :D. L'environnement utilisé pour l'écriture de ce sujet est Node.js (https://nodejs.org/fr/) en version 24 avec `npm` pour gérer les dépendances.
+Le code se fait en Javascript pour permettre au plus grand nombre de réaliser ce tutoriel et parce que c'est le langage de programmation que j'utilise quotidiennement :D. L'environnement utilisé est Node.js (https://nodejs.org/fr/), en version 24 minimum, avec `npm` pour gérer les dépendances.
 
 Ce tutoriel est la cinquième itération, vous pouvez trouver la quatrième là : https://github.com/dreimert/BuildYourChain.
 
-## Prérequis
+## Prérequis et installation de node
 
-Je pars du principe que vous savez coder en Javascript et utiliser git et github. Si ce n'est pas le cas, je vous invite à lire avant le TD :
+Ce sont les mêmes que pour le TD de scraping : suivez ses sections [Prérequis](https://github.com/dreimert/syd-scraping#prérequis) et [Installation de node](https://github.com/dreimert/syd-scraping#installation-de-node). Si vous avez fait le TD de scraping, vous n'avez rien à réinstaller : la version de node qu'il installe convient.
 
-* Javascript :
-  * https://eloquentjavascript.net/ (quatrième édition en anglais)
-* Programmation événementielle en Javascript:
-  * https://eloquentjavascript.net/11_async.html (Chapitre 11 de Eloquent JavaScript quatrième édition)
-  * https://www.fil.univ-lille.fr/~routier/enseignement/licence/tw1/spoc/chap10-evenements-partie1.html (Vidéo / cours de Jean-Christophe Routier)
-* Git : http://rogerdudler.github.io/git-guide/index.fr.html
-
-## Installation classique de node
-
-Vous êtes sur votre machine perso ? Tout se passe là : https://nodejs.org/
-
-## Installation de node si vous êtes sur les postes de l'INSA
-
-Attention ! Vous devez faire cette manipulation dans un répertoire non virtuel. Par exemple dans votre home. Si vous le faites dans HOME_INSA ou sur le bureau, ça ne fonctionnera pas.
-
-Télécharger les binaires et les décompresser :
-
-    wget https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-x64.tar.xz
-    tar -xJvf node-v24.22.1-linux-x64.tar.xz
-
-Mettre à jour votre PATH pour trouver les binaires :
-
-    echo "export PATH=$(pwd)/node-v24.22.1-linux-x64/bin/:\$PATH" >> ~/.bashrc
-
-Recharger vos variables d'environnement :
-
-    . ~/.bashrc
-
-Vérifier que node s'exécute bien :
+Vérifiez que node s'exécute bien :
 
     node --version
 
