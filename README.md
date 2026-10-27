@@ -2,20 +2,19 @@
 
 Le but de ce tutoriel est de coder une blockchain depuis un exemple simple de base de données pour en comprendre les mécanismes. Cette blockchain sera très loin d'une blockchain de production mais permettra d'illustrer les différentes mécaniques la constituant. Les notions et les problématiques seront introduites au fur et à mesure de la progression. Certaines seront *un peu* simplifiées.
 
-Le code se fait en Javascript pour permettre au plus grand nombre de réaliser ce tutoriel et parce que c'est le langage de programmation que j'utilise quotidiennement :D. L'environnement utilisé pour l'écriture de ce sujet est Node.js (https://nodejs.org/fr/) en version 16 avec `npm` pour gérer les dépendances.
+Le code se fait en Javascript pour permettre au plus grand nombre de réaliser ce tutoriel et parce que c'est le langage de programmation que j'utilise quotidiennement :D. L'environnement utilisé pour l'écriture de ce sujet est Node.js (https://nodejs.org/fr/) en version 24 avec `npm` pour gérer les dépendances.
 
 Ce tutoriel est la cinquième itération, vous pouvez trouver la quatrième là : https://github.com/dreimert/BuildYourChain.
 
 ## Prérequis
 
-Je pars du principe que vous savez coder en Javascript et utiliser git et github. Si ce n'est pas le cas, je vous invite pour le prochain TD à lire :
+Je pars du principe que vous savez coder en Javascript et utiliser git et github. Si ce n'est pas le cas, je vous invite à lire avant le TD :
 
 * Javascript :
-  * https://eloquentjavascript.net/ (troisième édition en anglais)
-  * https://fr.eloquentjavascript.net/ (première edition en français, anglais, allemand et polonais)
+  * https://eloquentjavascript.net/ (quatrième édition en anglais)
 * Programmation événementielle en Javascript:
-  * https://eloquentjavascript.net/11_async.html (Chapitre 11 de Eloquent JavaScript troisième édition)
-  * http://www.fil.univ-lille1.fr/~routier/enseignement/licence/tw1/spoc/chap10-evenements-partie1.html (Vidéo / cours de Jean-Christophe Routier)
+  * https://eloquentjavascript.net/11_async.html (Chapitre 11 de Eloquent JavaScript quatrième édition)
+  * https://www.fil.univ-lille.fr/~routier/enseignement/licence/tw1/spoc/chap10-evenements-partie1.html (Vidéo / cours de Jean-Christophe Routier)
 * Git : http://rogerdudler.github.io/git-guide/index.fr.html
 
 ## Installation classique de node
@@ -24,16 +23,16 @@ Vous êtes sur votre machine perso ? Tout se passe là : https://nodejs.org/
 
 ## Installation de node si vous êtes sur les postes de l'INSA
 
-Attention ! Vous devez faire cette manipulation dans un répertoire non virtuel. Par exemple dans votre home. Si vous le faite dans HOME_INSA ou sur le bureau, ça ne fonctionnera pas.
+Attention ! Vous devez faire cette manipulation dans un répertoire non virtuel. Par exemple dans votre home. Si vous le faites dans HOME_INSA ou sur le bureau, ça ne fonctionnera pas.
 
 Télécharger les binaires et les décompresser :
 
-    wget https://nodejs.org/dist/v16.13.0/node-v16.13.0-linux-x64.tar.xz
-    tar -xJvf node-v16.13.0-linux-x64.tar.xz
+    wget https://nodejs.org/dist/v24.22.1/node-v24.22.1-linux-x64.tar.xz
+    tar -xJvf node-v24.22.1-linux-x64.tar.xz
 
 Mettre à jour votre PATH pour trouver les binaires :
 
-    echo "export PATH=$(pwd)/node-v16.13.0-linux-x64/bin/:$PATH" >> ~/.bashrc
+    echo "export PATH=$(pwd)/node-v24.22.1-linux-x64/bin/:\$PATH" >> ~/.bashrc
 
 Recharger vos variables d'environnement :
 
@@ -62,24 +61,29 @@ Les buts de cette étape sont :
 
 * Mettre en place l'environnement du tutoriel.
 * Prise en main de l'environnement.
-* Comprendre les bases de socket.io.
+* Comprendre les bases de socket.io : envoyer un message et recevoir une réponse.
 * Comprendre le fonctionnement d'une base de données minimaliste.
 
 ## Durée
 
-Cette étape dure entre 10 et 30 min selon votre familiarité avec Javascript. Si vous dépassez les 30 min appeler l'enseignant pour vous débloquer.
+Cette étape dure entre 10 et 30 min selon votre familiarité avec Javascript. Si vous dépassez les 30 min, appelez l'enseignant pour vous débloquer.
 
 ## Une base de données minimaliste
 
-J'ai réalisé pour vous un serveur de base de données minimaliste. Pour l'exécuter, taper la commande : `node serveur.js`.
+J'ai réalisé pour vous un serveur de base de données minimaliste. Pour l'exécuter, tapez la commande : `node serveur.js`.
 
 Le serveur de la base de données n'accepte que trois commandes : `get`, `set` et `keys` :
 
 * get : permet de récupérer la valeur d'une clé. Si la clé n'existe pas, retourne une erreur.
-* set : permet d'associer une valeur à une clé, une fois une valeur associée à une clé, **il n'est plus possible de modifier la valeur**. Si la clé n'existe pas, la valeur est affectée à la clé. Si la clé existe, elle n'est pas modifiée et dans le cas où la valeur est identique, la commande ne retourne pas d'erreur et se résout normalement sinon la commande retourne une erreur `set error : Field ${field} exists.`.
+* set : permet d'associer une valeur à une clé. Une fois une valeur associée à une clé, **il n'est plus possible de modifier la valeur** :
+  * si la clé n'existe pas, la valeur est associée à la clé et la commande réussit ;
+  * si la clé existe avec la même valeur, rien ne change et la commande réussit ;
+  * si la clé existe avec une autre valeur, rien ne change et la commande retourne l'erreur `set error : Field ${field} exists.`.
 * keys : retourne la liste des clés de la base de données.
 
-J'ai codé un *CLI* (Command Line Interface) pour passer des commandes au serveur. Pour voir les commandes que le *CLI* peut lancer : `node cli.js`.
+Le serveur enregistre aussi la date de création de chaque clé. Elle ne sert pas pour l'instant, elle servira dans une prochaine étape.
+
+J'ai codé un *CLI* (Command Line Interface) pour passer des commandes au serveur. Pour voir les commandes que le *CLI* peut lancer : `node cli.js`. Les commandes `addPeer` et `peers` serviront à l'étape suivante : le serveur ne les connaît pas encore.
 
 #### Utilisez le *CLI* pour lancer les trois commandes et voir le comportement du serveur.
 
@@ -87,23 +91,27 @@ Vous pouvez voir le code du serveur et du *CLI* dans les fichiers `serveur.js` e
 
 Le fichier de test `test.js` va nous permettre de tester notre serveur de base de données automatiquement. Vous pouvez lancer les tests via la commande `npm test`. **Ce fichier lance automatiquement le serveur de base de données** et envoie les logs dans les fichiers `serveur.log` et `serveur.err`. Si vous n'arrivez pas à comprendre pourquoi les tests ne fonctionnent pas, lancez manuellement le serveur et les commandes.
 
-**Vous ne devrez jamais modifier le ficher du *CLI* ou le fichier de tests**. Ils seront mis à jour automatiquement au fur et à mesure de la progression.
+**Vous ne devrez jamais modifier le fichier du *CLI* ou le fichier de tests**. Ils seront mis à jour quand vous changerez d'étape avec `git checkout`. Si vous les avez modifiés par erreur, `git checkout -- cli.js test.js` annule vos modifications.
 
-#### Lancez les tests. Un test ne doit pas fonctionner. Corrigez le serveur pour que toutes les commandes fonctionnent et respectent le protocole.
+#### Lancez les tests. Un test échoue. Corrigez le serveur pour que toutes les commandes fonctionnent et respectent le protocole.
+
+#### Pourquoi est-il utile qu'un `set` avec la même valeur réussisse ? Pensez à ce qui se passe si le même message arrive deux fois.
 
 ## Socket.io
 
 Pour gagner du temps, j'utilise *socket.io* qui me permet d'établir une connexion entre le serveur et le client. Vous pouvez trouver la documentation là : https://socket.io/.
 
-Nous n'utiliseront pas beaucoup plus de fonctionnalités que celles utilisés dans l'exemple de serveur. Il faut savoir envoyer et recevoir un message.
+Nous n'utiliserons pas beaucoup plus de fonctionnalités que celles utilisées dans l'exemple de serveur. Il faut savoir envoyer et recevoir un message.
+
+#### En lisant `cli.js`, expliquez ce qu'il se passe côté client si le serveur n'appelle jamais le callback.
 
 ## Conclusion
 
 Vous avez survécu ? Cool !
 
-Quel est le rapport entre cette base de données et la blockchain ? La blockchain est une base de données avec les propriétés décrites. On ne peut pas mettre à jours les données ni en supprimer, on ne peut qu'en ajouter et lire le contenu.
+Quel est le rapport entre cette base de données et la blockchain ? La blockchain est une base de données avec les propriétés décrites. On ne peut pas mettre à jour les données ni en supprimer, on ne peut qu'en ajouter et lire le contenu.
 
-Mais la blockchain est une base de données distribuées, ce qui n'est pas le cas de la notre qui raisonne en terme de client / serveur. On va essayer de corriger ça !
+Mais la blockchain est une base de données distribuée, ce qui n'est pas le cas de la nôtre qui raisonne en termes de client / serveur. On va essayer de corriger ça !
 
 ## Suite
 
