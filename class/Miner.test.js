@@ -8,7 +8,7 @@ const test = _test.default(tape) // decorate tape
 test('Construction d\'un miner', function (t) {
   const miner = new Miner()
 
-  const block = new Block(0, null, [], 100000, BigInt('0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'))
+  const block = new Block(0, null, [], 100000, Block.MinimumDifficulty)
 
   miner.findPow(block)
 
@@ -17,14 +17,14 @@ test('Construction d\'un miner', function (t) {
   })
 
   return find.then((block) => {
-    t.equal(block.nonce, 6973)
-    t.equal(block.id, '0008fb9d19e42a03d17f4aac71d581a0d16b67667931439612a7d32c6d4ba129')
+    t.equal(block.nonce, 42969)
+    t.equal(block.id, '0000a8bb2e10070f57fe9c08ddf5e13442d854a88a07eb02436035582ca1d9e7')
     t.equal(block.id, block.getHash())
     t.equal(block.isValid(), true)
 
     return block
   }).then((block) => {
-    const blockBis = new Block(0, block.id, [], 100010, BigInt('0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'))
+    const blockBis = new Block(1, block.id, [], 100010, Block.MinimumDifficulty)
 
     miner.findPow(blockBis)
 
@@ -32,8 +32,8 @@ test('Construction d\'un miner', function (t) {
       miner.once('pow', resolve)
     })
   }).then((block) => {
-    t.equal(block.nonce, 3239)
-    t.equal(block.id, '000052c5ff02aa6eb8fb7717618043d4e357637c1163646458b7f96ef07f467b')
+    t.equal(block.nonce, 150336)
+    t.equal(block.id, '0000f5f363a5870f0eca6578e07c6da2b24449bcb23308661117ad80bc9f6e48')
     t.equal(block.id, block.getHash())
     t.equal(block.isValid(), true)
 
