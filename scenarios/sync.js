@@ -2,15 +2,15 @@ import networkTools from '../tools/network.js'
 import { execCommande } from '../tools/cli.js'
 import argv from '../tools/params.js'
 
-console.info('Lancement de deux noeuds de a et b')
+console.info('Lancement de deux noeuds a et b')
 
-// Lancement d'une chaine de 26 noeuds
+// Lancement de deux noeuds a et b
 networkTools.runNetwork(networkTools.parseTopology('a-b'), 7000, argv.verbose).then(() => {
-  // Mise en place de deux valeurs diffèrentes à chaque bout
+  // Attribution d'une valeur sur a
   console.info('Attribution de la valeur Reimert à nom pour a')
   return execCommande(`node ./cli.js --port=${networkTools.network.a.port} --bot=true set nom Reimert`)
 }).then(
-  networkTools.wait(5000) // On attend 5 secondes. C'est complémentement arbitraire.
+  networkTools.wait(5000) // On attend 5 secondes. C'est complètement arbitraire.
 ).then(() => {
   console.info('Recherche des valeurs de chaque noeuds')
   return Promise.all('ab'.split('').map((node) => {
@@ -24,11 +24,11 @@ networkTools.runNetwork(networkTools.parseTopology('a-b'), 7000, argv.verbose).t
   console.info('Ajout de c')
   return networkTools.runNetwork(networkTools.parseTopology('a-c b-c'), 7002, argv.verbose)
 }).then(() => {
-  // Mise en place de deux valeurs diffèrentes à chaque bout
+  // Attribution d'une valeur sur a
   console.info('Attribution de la valeur Damien à prenom pour a')
   return execCommande(`node ./cli.js --port=${networkTools.network.a.port} --bot=true set prenom Damien`)
 }).then(
-  networkTools.wait(5000) // On attend 5 secondes. C'est complémentement arbitraire.
+  networkTools.wait(5000) // On attend 5 secondes. C'est complètement arbitraire.
 ).then(() => {
   console.info('Recherche des valeurs de chaque noeuds')
   return Promise.all('abc'.split('').map((node) => {

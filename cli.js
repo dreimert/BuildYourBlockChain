@@ -5,7 +5,7 @@ import { hideBin } from 'yargs/helpers'
 import { io } from 'socket.io-client'
 
 const argv = yargs(hideBin(process.argv)) // Analyse des paramètres
-  .command('get <key>', 'Récupère la valeur associé à la clé')
+  .command('get <key>', 'Récupère la valeur associée à la clé')
   .command('set <key> <value> [timestamp]', 'Place une association clé / valeur')
   .command('keys', 'Demande la liste des clés')
   .command('addPeer <peerPort>', 'Ajoute un nouveau noeud voisin')
@@ -30,7 +30,7 @@ const argv = yargs(hideBin(process.argv)) // Analyse des paramètres
   .help()
   .argv
 
-// Si l'utilisateur demande la verion
+// Si l'utilisateur demande la version
 if (argv._[0] === 'version') {
   console.log('1.0.0')
   process.exit(0) // met fin au programme
