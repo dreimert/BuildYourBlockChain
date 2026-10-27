@@ -21,7 +21,7 @@ networkTools.runNetwork(networkTools.parseTopology('a-b')).then(() => {
   })
 }).then(() => {
   console.info('Ajout de c')
-  return networkTools.runNetwork(networkTools.parseTopology('a-c b-c'), 7002)
+  return networkTools.runNetwork(networkTools.parseTopology('a-c b-c'), 7402)
 }).then(() => {
   // Attribution d'une valeur sur a
   console.info('Attribution de la valeur Damien à prenom pour a')
