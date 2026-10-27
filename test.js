@@ -11,7 +11,7 @@ function splitAndSort (peers) {
 }
 
 // Si un port est pris, les tests parleraient à d'autres serveurs : on s'arrête là
-for (const port of [7350, 7351, 7352, 7353]) {
+for (const port of [7350, 7351, 7352, 7353, 7354]) {
   if (!await networkTools.isPortFree(port)) {
     console.error(`Le port ${port} est déjà utilisé. Avez-vous bien arrêté tous les serveurs en cours d'exécution ?`)
     process.exit(1)
@@ -102,9 +102,24 @@ test('Vérification de l\'initialisation', function (t) {
   })
 })
 
+// Cette fois, c'est le nouveau noeud qui fait addPeer : il doit se synchroniser lui-même
+test('Démarrage d\'un cinquième serveur e qui ajoute a comme voisin', function (t) {
+  return networkTools.runNetwork(networkTools.parseTopology('e-a'), 7354, false)
+})
+
+test('Vérification de l\'initialisation par addPeer', function (t) {
+  return execCommande('node ./cli.js --port=7354 --bot=true get casque', t).then(({ stdout, stderr }) => {
+    t.equal(stdout, 'quest2\n', 'La valeur doit être correcte sur e')
+  }).then(() => {
+    return execCommande('node ./cli.js --port=7354 --bot=true get jeu', t).then(({ stdout, stderr }) => {
+      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correcte sur e')
+    })
+  })
+})
+
 test('Vérification des voisins de a', function (t) {
   return execCommande('node ./cli.js --port=7350 --bot=true peers', t).then(({ stdout, stderr }) => {
-    t.deepEqual(splitAndSort(stdout), splitAndSort('7351,7352,7353\n'), 'trois voisins sur les ports 7351, 7352 et 7353')
+    t.deepEqual(splitAndSort(stdout), splitAndSort('7351,7352,7353,7354\n'), 'quatre voisins sur les ports 7351, 7352, 7353 et 7354')
   })
 })
 
@@ -126,7 +141,13 @@ test('Vérification des voisins de d', function (t) {
   })
 })
 
+test('Vérification des voisins de e', function (t) {
+  return execCommande('node ./cli.js --port=7354 --bot=true peers', t).then(({ stdout, stderr }) => {
+    t.deepEqual(splitAndSort(stdout), splitAndSort('7350\n'), 'un voisin sur le port 7350')
+  })
+})
+
 test('Kill serveurs', function (t) {
-  t.deepEqual(networkTools.killall(), [true, true, true, true], 'Arrêt des serveurs')
+  t.deepEqual(networkTools.killall(), [true, true, true, true, true], 'Arrêt des serveurs')
   return Promise.resolve()
 })

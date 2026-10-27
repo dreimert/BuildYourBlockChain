@@ -7,7 +7,7 @@ Les buts de cette étape sont :
 * Transformer notre base de données client / serveur en une base distribuée.
 * Comprendre les problèmes liés aux systèmes distribués.
 
-Vous pouvez lancer `npm test` à tout moment pour voir où vous en êtes. Les tests lancent quatre nœuds sur les ports 7350 à 7353 et vérifient la commande `peers`, le refus d'un voisin déjà connu, la propagation des valeurs et la synchronisation initiale.
+Vous pouvez lancer `npm test` à tout moment pour voir où vous en êtes. Les tests lancent cinq nœuds sur les ports 7350 à 7354 et vérifient la commande `peers`, le refus d'un voisin déjà connu, la propagation des valeurs et la synchronisation initiale.
 
 ## Confiance et défaillance (5 à 15 min)
 
