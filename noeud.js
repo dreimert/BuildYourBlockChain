@@ -106,7 +106,7 @@ if (argv.debug) {
 
 log.log('My node id:', nodeId)
 
-if (argv.saveOnSigkill) {
+if (argv.saveOnSig) {
   process.on('SIGINT', () => {
     if (!fs.existsSync('./saves')) {
       log.info('Création du dossier "saves"')
@@ -267,13 +267,14 @@ network.on('cmd', function (socket, cmd, callback) {
       callback(error.message)
     }
   } else if (cmd.type === 'addPeer') {
-    log.info('cmd::addPeer', cmd.params.url, cmd.params.port)
-    const s = network.addPeer(cmd.params.url, cmd.params.port, callback)
+    log.info('cmd::addPeer', cmd.params.url, cmd.params.force)
+    const s = network.addPeer(cmd.params.url, cmd.params.force, callback)
 
     if (s) {
       s.emit('last', (error, last) => {
         if (error) {
           log.error('addPeer::last fail:', error)
+          return
         }
 
         setBlock(Block.fromObject(last), s, callback)

@@ -20,6 +20,7 @@ class PoW {
     while (this.run) {
       if (await block._pow()) {
         block.id = block.getHash()
+        block.validaded = undefined // le nonce a changé : le résultat en cache n'est plus valable
         this.resolve(block)
         return
       }
@@ -113,6 +114,7 @@ export class Block {
     }
 
     this.id = this.getHash()
+    this.validaded = undefined // le nonce a changé : le résultat en cache n'est plus valable
 
     return this.nonce // retournez un nombre
   }

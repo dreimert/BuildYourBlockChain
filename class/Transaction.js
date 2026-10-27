@@ -23,6 +23,7 @@ export class Transaction {
     sign.end()
     this.signature = sign.sign(privateKey, 'hex')
     this.id = this.getHash()
+    this.validaded = undefined // la signature a changé : le résultat en cache n'est plus valable
   }
 
   isValid () {

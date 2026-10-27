@@ -55,7 +55,7 @@ export class Blockchain {
             this.integrateTransaction(tx)
           })
           return block
-        } else if (block.index > this.last().index + 1) {
+        } else if (block.index > this.last().index) { // chaîne concurrente plus longue
           log.info('rebuild chain from', block)
           this.rebuild(block)
           return block

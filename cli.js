@@ -14,7 +14,7 @@ yargs(hideBin(process.argv)) // Analyse des paramètres
   .command('get <key>', 'Récupère la valeur associé à la clé', () => {}, sendCommand)
   .command('set <key> <value> [timestamp]', 'Place une association clé / valeur', () => {}, sendCommand)
   .command('keys', 'Demande la liste des clés', () => {}, sendCommand)
-  .command('identities', 'Demande la liste des identitées', () => {}, sendCommand)
+  .command('identities', 'Demande la liste des identités', () => {}, sendCommand)
   .command('rewards', 'Demande la liste des rewards', () => {}, sendCommand)
   .command('peers', 'Demande la liste des pairs du noeud', () => {}, sendCommand)
   .command('addPeer <portOrPeerUrl>', 'Ajoute un nouveau noeud voisin. Authentification requise.', (yargs) => {

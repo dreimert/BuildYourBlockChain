@@ -75,9 +75,8 @@ export class Network extends EventEmitter {
       callback(error.message)
       return false
     } else {
-      if (!this.neighbors.includes(url)) {
-        this.neighbors.push(url)
-      }
+      // Avec force, on remplace l'ancienne connexion au lieu de la doubler
+      this.sockets.filter((socket) => socket.data.url === url).forEach((socket) => socket.disconnect())
 
       const neighborSocket = ioClient(url, {
         path: '/byc',
@@ -88,19 +87,41 @@ export class Network extends EventEmitter {
         }
       })
 
+      neighborSocket.data = { url }
+      let connected = false
+
+      // Les écouteurs sont posés une seule fois : socket.io se reconnecte tout seul
+      // et 'connect' est alors émis à nouveau.
+      this.initSocket(neighborSocket)
+
+      neighborSocket.on('disconnect', () => {
+        this.disconnect(neighborSocket)
+      })
+
       neighborSocket.on('connect', () => {
         log.info('addPeer::connect to', url, '=>', neighborSocket.id)
 
-        neighborSocket.data = { url }
-        this.sockets.push(neighborSocket)
+        if (!this.neighbors.includes(url)) {
+          this.neighbors.push(url)
+        }
 
-        neighborSocket.on('disconnect', () => {
-          this.disconnect(neighborSocket)
-        })
+        if (!this.sockets.includes(neighborSocket)) {
+          this.sockets.push(neighborSocket)
+        }
 
-        this.initSocket(neighborSocket)
+        if (!connected) {
+          connected = true
+          callback()
+        }
+      })
 
-        callback()
+      // Si la toute première connexion échoue, on abandonne au lieu de réessayer indéfiniment
+      neighborSocket.on('connect_error', (error) => {
+        if (!connected) {
+          log.warn('addPeer::connect_error', url, error.message)
+          neighborSocket.close()
+          callback(`connexion impossible à ${url} : ${error.message}`)
+        }
       })
 
       return neighborSocket
@@ -122,10 +143,10 @@ export class Network extends EventEmitter {
   disconnect (socket) {
     log.info('disconnect to', socket.id)
 
-    const indexInNeighbors = this.sockets.indexOf(socket.data.url)
+    const indexInNeighbors = this.neighbors.indexOf(socket.data.url)
 
     if (indexInNeighbors >= 0) {
-      this.sockets.splice(indexInNeighbors, 1)
+      this.neighbors.splice(indexInNeighbors, 1)
     }
 
     const indexInSocket = this.sockets.indexOf(socket)
