@@ -7,6 +7,8 @@ Les buts de cette étape sont :
 * Transformer notre base de données client / serveur en une base distribuée.
 * Comprendre les problèmes liés aux systèmes distribués.
 
+Vous pouvez lancer `npm test` à tout moment pour voir où vous en êtes. Les tests lancent quatre nœuds sur les ports 7350 à 7353 et vérifient la commande `peers`, le refus d'un voisin déjà connu, la propagation des valeurs et la synchronisation initiale.
+
 ## Confiance et défaillance (5 à 15 min)
 
 Dans l'approche par client / serveur, vous devez avoir confiance dans le serveur :
@@ -18,15 +20,15 @@ Vous devez avoir confiance dans le fait que l'individu ou l'entité qui opère l
 
 Pour résister aux pannes ou à une forte demande vous pouvez aussi avoir envie de mettre plusieurs serveurs, chacun pouvant absorber une partie de la charge.
 
-La solution utilisée par la blockchain est la distribution. Il n'y a pas de serveur central, tout le monde peut se rajouter au réseau et assurer le rôle de serveur. C'est une base de données distribuées. Distribuer revient à avoir plusieurs serveurs qui se synchronisent entre eux. On ne parle plus de serveur dans ce cas mais de nœuds du réseau. Il n'y a plus besoin d'avoir confiance dans un unique individu mais il faut faire confiance à l'ensemble du système donc à de multiples individus.
+La solution utilisée par la blockchain est la distribution. Il n'y a pas de serveur central, tout le monde peut se rajouter au réseau et assurer le rôle de serveur. C'est une base de données distribuée. Distribuer revient à avoir plusieurs serveurs qui se synchronisent entre eux. On ne parle plus de serveur dans ce cas mais de nœuds du réseau. Il n'y a plus besoin d'avoir confiance dans un unique individu mais il faut faire confiance à l'ensemble du système donc à de multiples individus.
 
-#### Essayer de lancer plusieurs fois le serveur. Que se passe-t-il ? Pourquoi ?
+#### Essayez de lancer plusieurs fois le serveur. Que se passe-t-il ? Pourquoi ?
 
 Mettre plusieurs nœuds sur une même machine n'est pas une idée de génie. En production, l'utilité est assez limitée mais en test ou en développement, c'est fort utile à moins de disposer de plusieurs machines.
 
 Il faut pouvoir lancer le nœud plusieurs fois avec des configurations différentes.
 
-#### Observer le code source de `serveur.js`. Lancez plusieurs nœuds en parallèle sans modifier le code source.
+#### Observez le code source de `serveur.js`. Lancez plusieurs nœuds en parallèle sans modifier le code source.
 
 ##### Indice : vous connaissez la différence entre '-' et '--' en Bash ?
 
@@ -34,31 +36,31 @@ Vous êtes maintenant en mesure de lancer plusieurs nœuds en parallèle mais il
 
 ## Jouer avec des inconnus (20 à 45 min)
 
-Il faut maintenant faire en sorte que nos nœuds se voient et se parlent. Pour cela, il faut savoir comment les contacter. Dans Bitcoin et dans un système distribué plus généralement, on peut ajouter un nœud à tout moment et sans le connaitre.
+Il faut maintenant faire en sorte que nos nœuds se voient et se parlent. Pour cela, il faut savoir comment les contacter. Dans Bitcoin et dans un système distribué plus généralement, on peut ajouter un nœud à tout moment et sans le connaître.
 
 J'ai ajouté dans le *CLI* deux commandes : `addPeer` et `peers`.
 
-La commande `addPeer` prend un port en paramètre. Ce port sera utilisé pour ajouter un nouveau voisin au nœud. Retourne une erreur si le voisin existe déjà.
+La commande `addPeer` prend un port en paramètre. Ce port sera utilisé pour ajouter un nouveau voisin au nœud. Si le voisin existe déjà, elle retourne l'erreur `neighbor exists` (les tests vérifient ce message exact).
 
 La commande `peers` demande au nœud de retourner la liste de ses voisins.
 
 #### Déclarez un tableau `neighbors` contenant la liste des ports utilisés par les voisins.
 
 ```Javascript
-const neighbors = [];
+const neighbors = []
 ```
 
 #### En vous inspirant des commandes déjà présentes dans le nœud, ajoutez dans `serveur.js` une commande `peers` qui retourne la liste des ports utilisés.
 
-Pour vérifier que la commande fonctionne, vous pouvez initialiser le tableau avec des valeurs : `const neighbors = ['a', 'b', 'c'];`.
+Pour vérifier que la commande fonctionne, vous pouvez initialiser le tableau avec des valeurs : `const neighbors = ['a', 'b', 'c']`.
 
 #### Ajoutez une commande `addPeer` à votre nœud. Dans un premier temps, faites en sorte que cette commande ajoute le port à la liste des voisins s'il n'y est pas déjà.
 
 ##### Indice 1 :
 
 ```Javascript
-const maVariable = 42;
-myArray.push(maVariable);
+const maVariable = 42
+myArray.push(maVariable)
 // La fonction push ajoute 'maVariable' à la fin du tableau
 ```
 
@@ -66,9 +68,9 @@ myArray.push(maVariable);
 
 #### Vérifiez le bon fonctionnement avec la commande `peers`.
 
-Les deux commandes semblent fonctionner ? Parfait, le comportement actuel de `addPeer` correspond au fonctionnement d'une autre fonction : `auth`. `auth` permet à un serveur de s'identifier comme voisin à un autre serveur. Nous verrons plus tard son utilisation
+Les deux commandes semblent fonctionner ? Parfait ! Le comportement actuel de `addPeer` est exactement celui d'une autre commande dont nous allons avoir besoin : `auth`. Quand un nœud A se connecte à un nœud B, B voit arriver une connexion mais ne sait pas qu'elle vient d'un nœud : ce pourrait être le *CLI*. A doit donc s'annoncer avec `auth` et son propre port pour que B l'ajoute à ses voisins.
 
-#### Copier la version actuelle de `addPeer` et renommer la copie `auth`.
+#### Copiez la version actuelle de `addPeer` et renommez la copie `auth`.
 
 Il faut maintenant que les nœuds communiquent entre eux.
 
@@ -79,12 +81,14 @@ import { io as ioClient } from 'socket.io-client'
 
 socket.on('addPeer', function (...) {
   // ...
-  const socket = ioClient(`http://localhost:${port}`, {
+  const neighborSocket = ioClient(`http://localhost:${port}`, {
     path: '/byc'
-  });
+  })
   // ...
 })
 ```
+
+Attention à ne pas confondre les deux sockets : `socket` est la connexion avec celui qui a envoyé la commande (le plus souvent le *CLI*), `neighborSocket` est la connexion avec le nouveau voisin.
 
 Quand la connexion est établie, l'événement `connect` est émis. Vous pouvez observer le code du *CLI* pour avoir un exemple.
 
@@ -102,11 +106,13 @@ Est-ce que le nœud ajouté indique bien une nouvelle connexion ? Oui ? Cool ! P
 
 Nos nœuds doivent maintenant échanger des informations. Vous allez essayer de mettre en place 3 nœuds qui communiquent entre eux et se synchronisent. Par exemple, supposons que vous utilisez les ports 3000, 3001 et 3002.
 
+Lancer et connecter trois nœuds à la main devient vite pénible : la section [Réseauter](#réseauter-5-min) présente un outil qui le fait pour vous.
+
 Si vous avez respecté les consignes jusque là, votre nœud est connecté aux autres. Il faut maintenant mettre à jour les autres quand lui-même est modifié.
 
 Pour commencer, il faut stocker les sockets pour pouvoir écrire à nos contacts.
 
-#### Déclarer un tableau `sockets` qui contiendra la liste des sockets du nœud.
+#### Déclarez un tableau `sockets` qui contiendra la liste des sockets du nœud.
 
 #### Modifiez la commande `addPeer` pour qu'elle stocke la socket dans le tableau `sockets`.
 
@@ -114,16 +120,16 @@ Pour commencer, il faut stocker les sockets pour pouvoir écrire à nos contacts
 
 N'oubliez pas d'appliquer la fonction `initSocket` aux sockets que vous créez dans `addPeer`. De préférence après qu'elles soient connectées.
 
-#### Modifiez la méthode `set` pour qu'elle mette à jour les autres pairs.
+#### Modifiez la commande `set` pour qu'elle mette à jour les autres pairs.
 
 ##### Indice 1 :
 ```Javascript
 // Un tableau rempli de choses
-const monTableau = ['a', 'b', 'c', 'd'];
+const monTableau = ['a', 'b', 'c', 'd']
 monTableau.forEach((element, index) => {
-    // Je peux faire quelque-chose pour chaque élément.
-    console.log("L'élément à l'index", index, "du tableau est", element);
-});
+  // Je peux faire quelque chose pour chaque élément.
+  console.log("L'élément à l'index", index, 'du tableau est', element)
+})
 ```
 
 ##### Indice 2 : Vous pouvez voir comment envoyer une commande `set` dans `cli.js`.
@@ -134,28 +140,34 @@ monTableau.forEach((element, index) => {
 
 Vous avez réussi ? `set` une valeur sur un des nœuds met automatiquement à jour les autres ? Cool !
 
+#### Connectez trois nœuds en triangle (a-b, b-c et c-a). Pourquoi un `set` ne tourne-t-il pas en rond entre eux ? Que se passerait-il si chaque nœud retransmettait tous les `set` qu'il reçoit ?
+
 ### Commérages
 
 Imaginez trois amis qui essayent de maintenir une connaissance commune du statut relationnel de leurs connaissances. Réfléchissez maintenant à tous les problèmes qui peuvent arriver. Que se passe-t-il si un des amis est malade ou n'a plus de connexion réseau ? Si deux amis reçoivent en même temps des informations différentes pour une même personne ? Combien de temps avant de se synchroniser ? Comment se synchroniser ?
 
 #### Prenez le temps d'y réfléchir.
 
-Nous verrons comment résoudre ces difficultés à l'étape suivant.
+Nous verrons comment résoudre ces difficultés à l'étape suivante.
 
 ## Synchronisation initiale (10 à 30 min)
 
 Lancez deux nœuds et connectez-les. Ajoutez quelques valeurs. Lancez maintenant un troisième nœud et connectez-le aux deux autres.
 
-#### Demander au troisième nœud une valeur définie avant son lancement. Quel est le problème ?
+#### Demandez au troisième nœud une valeur définie avant son lancement. Quel est le problème ?
 
-#### Écrire une **fonction** `sync` qui prend en paramètre une *socket*. Elle envoie une requête `keys` et ajoute les couples clé / valeur inconnues.
+#### Écrivez une **fonction** `sync` qui prend en paramètre une *socket*. Elle demande la liste des clés avec `keys`, puis récupère avec `get` les valeurs des clés qu'elle ne connaît pas.
 
 ##### Indice :
 ```Javascript
 function sync (socket) { /* ... */ }
 ```
 
-#### Modifier la commande `auth` et `addPeer` pour qu'à chaque nouvelle connexion entre serveur, la **fonction** `sync` soit appelée.
+#### Modifiez les commandes `auth` et `addPeer` pour qu'à chaque nouvelle connexion entre serveurs, la **fonction** `sync` soit appelée.
+
+##### Indice : dans `addPeer`, attendez que la connexion soit établie et passez à `sync` la socket du voisin, pas celle du *CLI*.
+
+#### Que se passe-t-il si deux nœuds ont déjà des valeurs différentes pour une même clé au moment où ils se connectent ?
 
 ## Réseauter (5 min)
 
@@ -189,9 +201,16 @@ Lancez `npm test`.
 
 Nous avons un système qui marche plus ou moins, dans lequel n'importe quel nœud peut se connecter et reconstruire la base de données. C'est un système distribué minimaliste mais il ne fonctionne que dans un monde idéal où il n'y a pas de pannes ni de personnes mal intentionnées.
 
+Ce qu'il faut retenir :
+
+* Il n'y a plus de serveur central : chaque nœud est à la fois client et serveur de ses voisins.
+* Les nœuds se découvrent (`addPeer`, `auth`) puis propagent les modifications de proche en proche.
+* Pour que la propagation s'arrête, un nœud ne retransmet que ce qui est nouveau pour lui.
+* Un nœud qui arrive doit se synchroniser pour récupérer ce qui a été écrit avant lui.
+
 ## Suite
 
-Aller à l'étape 2 : `git checkout etape-2`.
+Allez à l'étape 2 : `git checkout etape-2`.
 
 Pour continuer à lire le sujet :
 
@@ -206,6 +225,6 @@ Vous pouvez mettre en place des backups sur disque de la base de données.
 
 ### Partager ses voisins (bonus)
 
-Ajouter les voisins à chaque nœud et à chaque fois que vous relancez les nœuds est assez pénible ? Dans un vrai système pair à pair, *peer to peer* en anglais, abrégé P2P, la liste des voisins est envoyée aux nouveaux qui peuvent alors s'y connecter tout seul.
+Ajouter les voisins à chaque nœud et à chaque fois que vous relancez les nœuds est assez pénible ? Dans un vrai système pair à pair, *peer to peer* en anglais, abrégé P2P, la liste des voisins est envoyée aux nouveaux qui peuvent alors s'y connecter tout seuls.
 
 #### Ajoutez une option `auto-connect` en regardant comment fonctionne le *CLI* pour vous connecter automatiquement aux voisins de vos nouveaux voisins.
