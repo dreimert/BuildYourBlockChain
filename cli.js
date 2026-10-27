@@ -6,8 +6,9 @@ import { io } from 'socket.io-client'
 
 const argv = yargs(hideBin(process.argv)) // Analyse des paramètres
   .command('get <key>', 'Récupère la valeur associée à la clé')
-  .command('set <key> <value> [timestamp]', 'Place une association clé / valeur')
+  .command('set <key> <value> [timestamp]', 'Place une association clé / valeur (date en ms optionnelle)')
   .command('keys', 'Demande la liste des clés')
+  .command('keysAndTime', 'Demande les clés avec leur date et leur empreinte')
   .command('addPeer <peerPort>', 'Ajoute un nouveau noeud voisin')
   .command('peers', 'Demande la liste des pairs du noeud')
   .command('version', 'Demande la version du CLI')

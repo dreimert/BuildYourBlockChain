@@ -12,7 +12,7 @@ networkTools.runNetwork(networkTools.parseTopology('a-b'), 7400, argv.verbose).t
 }).then(
   networkTools.wait(5000) // On attend 5 secondes. C'est complètement arbitraire.
 ).then(() => {
-  console.info('Recherche des valeurs de chaque noeuds')
+  console.info('Recherche des valeurs de chaque noeud')
   return Promise.all('ab'.split('').map((node) => {
     return execCommande(`node cli.js --port=${networkTools.network[node].port} --bot=true get nom`).then(({ stdout, stderr }) => {
       return `${node} => ${stdout.substring(0, 7)}`
@@ -30,7 +30,7 @@ networkTools.runNetwork(networkTools.parseTopology('a-b'), 7400, argv.verbose).t
 }).then(
   networkTools.wait(5000) // On attend 5 secondes. C'est complètement arbitraire.
 ).then(() => {
-  console.info('Recherche des valeurs de chaque noeuds')
+  console.info('Recherche des valeurs de chaque noeud')
   return Promise.all('abc'.split('').map((node) => {
     return execCommande(`node cli.js --port=${networkTools.network[node].port} --bot=true get nom`).then(({ stdout, stderr }) => {
       return `${node} => ${stdout.substring(0, 7)}`
@@ -39,7 +39,7 @@ networkTools.runNetwork(networkTools.parseTopology('a-b'), 7400, argv.verbose).t
     console.info(liste)
   })
 }).then(() => {
-  console.info('Recherche des valeurs de chaque noeuds')
+  console.info('Recherche des valeurs de chaque noeud')
   return Promise.all('abc'.split('').map((node) => {
     return execCommande(`node cli.js --port=${networkTools.network[node].port} --bot=true get prenom`).then(({ stdout, stderr }) => {
       return `${node} => ${stdout.substring(0, 6)}`
