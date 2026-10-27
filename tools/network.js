@@ -129,7 +129,7 @@ export function parseTopology (topology) {
   })
 }
 
-export function runNetwork (topology, port = 7000, verbose = true, timeout = 15000) {
+export function runNetwork (topology, port = 7400, verbose = true, timeout = 15000) {
   // run est asynchrone : on calcule la liste des nouveaux noeuds avant de les lancer
   const newIds = [...new Set(topology.flat())].filter((id) => !network[id])
   const newNodes = newIds.map((id) => run(id, port++, verbose))

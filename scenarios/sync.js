@@ -5,7 +5,7 @@ import argv from '../tools/params.js'
 console.info('Lancement de deux noeuds a et b')
 
 // Lancement de deux noeuds a et b
-networkTools.runNetwork(networkTools.parseTopology('a-b'), 7000, argv.verbose).then(() => {
+networkTools.runNetwork(networkTools.parseTopology('a-b'), 7400, argv.verbose).then(() => {
   // Attribution d'une valeur sur a
   console.info('Attribution de la valeur Reimert à nom pour a')
   return execCommande(`node ./cli.js --port=${networkTools.network.a.port} --bot=true set nom Reimert`)
@@ -22,7 +22,7 @@ networkTools.runNetwork(networkTools.parseTopology('a-b'), 7000, argv.verbose).t
   })
 }).then(() => {
   console.info('Ajout de c')
-  return networkTools.runNetwork(networkTools.parseTopology('a-c b-c'), 7002, argv.verbose)
+  return networkTools.runNetwork(networkTools.parseTopology('a-c b-c'), 7402, argv.verbose)
 }).then(() => {
   // Attribution d'une valeur sur a
   console.info('Attribution de la valeur Damien à prenom pour a')
