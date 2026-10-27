@@ -13,22 +13,22 @@ const getMapping = () => {
 }
 
 // Lancement de deux chaines de 13 noeuds
-networkTools.runNetwork(networkTools.parseTopology('a-b b-c c-d d-e e-f f-g g-h h-i i-j j-k k-l l-m n-o o-p p-q q-r r-s s-t t-u u-v v-w w-x x-y y-z'), 7000, argv.verbose).then(() => {
-  // Mise en place de deux valeurs diffèrentes à chaque bout
-  console.info('Attribution de la valeur Paris pour a et Tokio pour z.')
+networkTools.runNetwork(networkTools.parseTopology('a-b b-c c-d d-e e-f f-g g-h h-i i-j j-k k-l l-m n-o o-p p-q q-r r-s s-t t-u u-v v-w w-x x-y y-z'), 7400, argv.verbose).then(() => {
+  // Mise en place de deux valeurs différentes à chaque bout
+  console.info('Attribution de la valeur Paris pour a et Tokyo pour z.')
   return Promise.all([
     // Initialisation de a avec Paris
     cliTools.execCommande(`node ./cli.js --port=${networkTools.network.a.port} --bot=true set Ville Paris 10000`),
-    // Initialisation de z avec Tokio
-    cliTools.execCommande(`node ./cli.js --port=${networkTools.network.z.port} --bot=true set Ville Tokio 10001`)
+    // Initialisation de z avec Tokyo
+    cliTools.execCommande(`node ./cli.js --port=${networkTools.network.z.port} --bot=true set Ville Tokyo 10001`)
   ])
 }).then(
-  networkTools.wait(3000) // On attend 3 secondes. C'est complémentement arbitraire.
+  networkTools.wait(3000) // On attend 3 secondes. C'est complètement arbitraire.
 ).then(() => {
   console.info('On connecte les deux clusters...')
-  return networkTools.runNetwork(networkTools.parseTopology('m-n'))
+  return networkTools.runNetwork(networkTools.parseTopology('m-n'), 7400, argv.verbose)
 }).then(
-  networkTools.wait(3000) // On attend 3 secondes. C'est complémentement arbitraire.
+  networkTools.wait(3000) // On attend 3 secondes. C'est complètement arbitraire.
 ).then(getMapping).then((liste) => {
   console.info(liste)
   console.info('Arrêtez ce programme pour arrêter l\'ensemble des noeuds lancés ou laissez le tourner pour pouvoir les explorer.')
