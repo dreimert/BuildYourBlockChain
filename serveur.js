@@ -8,7 +8,8 @@ import { Server } from 'socket.io'
 const argv = yargs(hideBin(process.argv))
   .option('port', {
     alias: 'p',
-    default: '3000',
+    type: 'number',
+    default: 3000,
     description: 'port à utiliser'
   })
   .version('1.0.0')
