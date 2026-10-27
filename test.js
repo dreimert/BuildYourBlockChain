@@ -10,9 +10,17 @@ function splitAndSort (peers) {
   return peers.replace('\n', '').split(',').sort()
 }
 
+// Si un port est pris, les tests parleraient à d'autres serveurs : on s'arrête là
+for (const port of [7350, 7351, 7352, 7353]) {
+  if (!await networkTools.isPortFree(port)) {
+    console.error(`Le port ${port} est déjà utilisé. Avez-vous bien arrêté tous les serveurs en cours d'exécution ?`)
+    process.exit(1)
+  }
+}
+
 test('Vérification de la version', function (t) {
   return execCommande('node ./serveur.js --version', t).then(({ stdout, stderr }) => {
-    t.equal(stdout, '1.0.0\n', 'Numero de version')
+    t.equal(stdout, '1.0.0\n', 'Numéro de version')
   })
 })
 
@@ -49,15 +57,15 @@ test('Vérification de la propagation de valeur', function (t) {
     t.equal(stdout, 'OK\n', 'Set doit réussir')
   }).then(() => {
     return execCommande('node ./cli.js --port=7350 --bot=true get casque', t).then(({ stdout, stderr }) => {
-      t.equal(stdout, 'quest2\n', 'La valeur doit être correct sur a')
+      t.equal(stdout, 'quest2\n', 'La valeur doit être correcte sur a')
     })
   }).then(() => {
     return execCommande('node ./cli.js --port=7351 --bot=true get casque', t).then(({ stdout, stderr }) => {
-      t.equal(stdout, 'quest2\n', 'La valeur doit être correct sur b')
+      t.equal(stdout, 'quest2\n', 'La valeur doit être correcte sur b')
     })
   }).then(() => {
     return execCommande('node ./cli.js --port=7352 --bot=true get casque', t).then(({ stdout, stderr }) => {
-      t.equal(stdout, 'quest2\n', 'La valeur doit être correct sur c')
+      t.equal(stdout, 'quest2\n', 'La valeur doit être correcte sur c')
     })
   })
 })
@@ -67,15 +75,15 @@ test('Vérification de la propagation d\'une seconde valeur', function (t) {
     t.equal(stdout, 'OK\n', 'Set doit réussir')
   }).then(() => {
     return execCommande('node ./cli.js --port=7350 --bot=true get jeu', t).then(({ stdout, stderr }) => {
-      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correct sur a')
+      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correcte sur a')
     })
   }).then(() => {
     return execCommande('node ./cli.js --port=7351 --bot=true get jeu', t).then(({ stdout, stderr }) => {
-      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correct sur b')
+      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correcte sur b')
     })
   }).then(() => {
     return execCommande('node ./cli.js --port=7352 --bot=true get jeu', t).then(({ stdout, stderr }) => {
-      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correct sur c')
+      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correcte sur c')
     })
   })
 })
@@ -86,10 +94,10 @@ test('Démarrage d\'un quatrième serveur d connecté à a', function (t) {
 
 test('Vérification de l\'initialisation', function (t) {
   return execCommande('node ./cli.js --port=7353 --bot=true get casque', t).then(({ stdout, stderr }) => {
-    t.equal(stdout, 'quest2\n', 'La valeur doit être correct sur d')
+    t.equal(stdout, 'quest2\n', 'La valeur doit être correcte sur d')
   }).then(() => {
     return execCommande('node ./cli.js --port=7353 --bot=true get jeu', t).then(({ stdout, stderr }) => {
-      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correct sur d')
+      t.equal(stdout, 'beatsaber\n', 'La valeur doit être correcte sur d')
     })
   })
 })
@@ -112,13 +120,13 @@ test('Vérification des voisins de c', function (t) {
   })
 })
 
-test('Vérification des voisins de c', function (t) {
+test('Vérification des voisins de d', function (t) {
   return execCommande('node ./cli.js --port=7353 --bot=true peers', t).then(({ stdout, stderr }) => {
     t.deepEqual(splitAndSort(stdout), splitAndSort('7350\n'), 'un voisin sur le port 7350')
   })
 })
 
 test('Kill serveurs', function (t) {
-  t.deepEqual(networkTools.killall(), [true, true, true, true], 'Arret des serveurs')
+  t.deepEqual(networkTools.killall(), [true, true, true, true], 'Arrêt des serveurs')
   return Promise.resolve()
 })

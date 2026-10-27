@@ -1,4 +1,5 @@
 import fs from 'fs'
+import net from 'net'
 import { spawn } from 'child_process'
 import { io } from 'socket.io-client'
 
@@ -29,9 +30,46 @@ export function wait (ms, verbose = true) {
   }
 }
 
+export function isPortFree (port) {
+  return new Promise((resolve, reject) => {
+    const tester = net.createServer()
+      .once('error', err => (err.code === 'EADDRINUSE' ? resolve(false) : reject(err)))
+      .once('listening', () => tester.once('close', () => resolve(true)).close())
+      .listen(port)
+  })
+}
+
+// Attend qu'un serveur écoute sur le port, pour ne pas lancer les commandes trop tôt
+export function waitForPort (port, timeout = 5000) {
+  const start = Date.now()
+
+  return new Promise((resolve, reject) => {
+    function attempt () {
+      const socket = net.connect(port, 'localhost')
+        .once('connect', () => {
+          socket.end()
+          resolve()
+        })
+        .once('error', () => {
+          if (Date.now() - start > timeout) {
+            reject(new Error(`Port ${port} toujours fermé après ${timeout} ms`))
+          } else {
+            setTimeout(attempt, 100)
+          }
+        })
+    }
+
+    attempt()
+  })
+}
+
 export const network = {}
 
-export function run (id, port, verbose = true) {
+export async function run (id, port, verbose = true) {
+  if (!await isPortFree(port)) {
+    throw new Error(`Le port ${port} est déjà utilisé. Avez-vous bien arrêté tous les serveurs en cours d'exécution ?`)
+  }
+
   if (!fs.existsSync('./logs')) {
     fs.mkdirSync('./logs')
   }
@@ -75,7 +113,9 @@ export function run (id, port, verbose = true) {
 
   return Promise.race([
     onError,
-    wait(1000, false)()
+    waitForPort(port).catch(() => {
+      throw new Error(`Le noeud ${id} n'écoute pas sur le port ${port}. Regardez le fichier logs/${id}.err.`)
+    })
   ])
 }
 
@@ -90,17 +130,9 @@ export function parseTopology (topology) {
 }
 
 export function runNetwork (topology, port = 7000, verbose = true, timeout = 15000) {
-  const newNodes = []
-
-  topology.forEach((connexion) => {
-    if (!network[connexion[0]]) {
-      newNodes.push(run(connexion[0], port++, verbose))
-    }
-
-    if (!network[connexion[1]]) {
-      newNodes.push(run(connexion[1], port++, verbose))
-    }
-  })
+  // run est asynchrone : on calcule la liste des nouveaux noeuds avant de les lancer
+  const newIds = [...new Set(topology.flat())].filter((id) => !network[id])
+  const newNodes = newIds.map((id) => run(id, port++, verbose))
 
   return Promise.all(newNodes).then(() => {
     return Promise.all(topology.map((connexion) => {
@@ -114,14 +146,15 @@ export function setNeighbor (src, dst, verbose = true, timeout = 5000) {
     console.info(`# Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`)
   }
 
-  return promiseTimeout(`Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`, timeout, new Promise((resolve, reject) => {
-    const socket = io(`http://localhost:${src.port}`, {
-      path: '/byc',
-      timeout: 1000,
-      reconnection: true,
-      requestTimeout: 1000
-    })
+  const socket = io(`http://localhost:${src.port}`, {
+    path: '/byc',
+    timeout: 1000,
+    reconnection: true,
+    requestTimeout: 1000
+  })
 
+  // On ferme la socket même en cas de timeout, sinon elle empêche le programme de se terminer
+  return promiseTimeout(`Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`, timeout, new Promise((resolve, reject) => {
     socket.on('connect', () => {
       socket.emit('addPeer', dst.port, (error) => {
         if (error) {
@@ -133,7 +166,7 @@ export function setNeighbor (src, dst, verbose = true, timeout = 5000) {
         socket.close()
       })
     })
-  }))
+  })).finally(() => socket.close())
 }
 
 export function auth (target, neighbor, verbose = true, timeout = 5000) {
@@ -160,7 +193,7 @@ export function auth (target, neighbor, verbose = true, timeout = 5000) {
         socket.close()
       })
     })
-  }))
+  })).finally(() => socket.close())
 }
 
 export function killall () {
@@ -174,6 +207,8 @@ export function killall () {
 export default {
   network,
   wait,
+  isPortFree,
+  waitForPort,
   run,
   parseTopology,
   runNetwork,
