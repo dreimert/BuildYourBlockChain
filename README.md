@@ -74,9 +74,9 @@ J'ai réalisé pour vous un serveur de base de données minimaliste. Pour l'exé
 
 Le serveur de la base de données n'accepte que trois commandes : `get`, `set` et `keys` :
 
-* get : permet de récupérer la valeur d'une clé. Si la clé n'existe pas, retourne une erreur.
+* get : permet de récupérer la valeur d'une clé. Si la clé n'existe pas dans la base de données, retourne une erreur.
 * set : permet d'associer une valeur à une clé. Une fois une valeur associée à une clé, **il n'est plus possible de modifier la valeur** :
-  * si la clé n'existe pas, la valeur est associée à la clé et la commande réussit ;
+  * si la clé n'existe pas dans la base de données, la valeur est associée à la clé et la commande réussit ;
   * si la clé existe avec la même valeur, rien ne change et la commande réussit ;
   * si la clé existe avec une autre valeur, rien ne change et la commande retourne l'erreur `set error : Field ${field} exists.`.
 * keys : retourne la liste des clés de la base de données.
@@ -94,6 +94,8 @@ Le fichier de test `test.js` va nous permettre de tester notre serveur de base d
 **Vous ne devrez jamais modifier le fichier du *CLI* ou le fichier de tests**. Ils seront mis à jour quand vous changerez d'étape avec `git checkout`. Si vous les avez modifiés par erreur, `git checkout -- cli.js test.js` annule vos modifications.
 
 #### Lancez les tests. Un test échoue. Corrigez le serveur pour que toutes les commandes fonctionnent et respectent le protocole.
+
+##### Indice : db[field].value
 
 #### Pourquoi est-il utile qu'un `set` avec la même valeur réussisse ? Pensez à ce qui se passe si le même message arrive deux fois.
 
