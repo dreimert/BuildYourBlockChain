@@ -252,7 +252,9 @@ test('À date égale, la valeur de plus petite empreinte gagne', function (t) {
 // # Résistance aux pannes : deux noeuds qui ont divergé se réparent à la connexion
 
 test('Démarrage de deux serveurs f et g non connectés', function (t) {
-  return Promise.all([networkTools.run('f', 7355, false), networkTools.run('g', 7356, false)])
+  return networkTools.runNodes(['f', 'g'], 7355, false).then(() => {
+    t.pass('f et g écoutent sur les ports 7355 et 7356')
+  })
 })
 
 test('Valeurs différentes sur f et g', function (t) {
@@ -265,7 +267,7 @@ test('Valeurs différentes sur f et g', function (t) {
 })
 
 test('La connexion de f et g corrige la désynchronisation', function (t) {
-  return networkTools.runNetwork(networkTools.parseTopology('f-g'), 7355, false)
+  return networkTools.connectNetwork(networkTools.parseTopology('f-g'), false)
     .then(networkTools.wait(500, false))
     .then(() => Promise.all([getOn(7355, 'Pays'), getOn(7356, 'Pays')]))
     .then((values) => {
