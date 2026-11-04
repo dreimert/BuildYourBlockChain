@@ -25,7 +25,15 @@ test('Vérification de la version', function (t) {
 })
 
 test('Démarrage de trois serveurs a, b et c', function (t) {
-  return networkTools.runNetwork(networkTools.parseTopology('a-b b-c a-c'), 7350, false)
+  return networkTools.runNodes(['a', 'b', 'c'], 7350, false).then(() => {
+    t.pass('a, b et c écoutent sur les ports 7350, 7351 et 7352')
+  })
+})
+
+test('Connexion de a, b et c avec addPeer', function (t) {
+  return networkTools.connectNetwork(networkTools.parseTopology('a-b b-c a-c'), false).then(() => {
+    t.pass('addPeer a répondu sans erreur')
+  })
 })
 
 test('Vérification des voisins de a', function (t) {
@@ -88,8 +96,16 @@ test('Vérification de la propagation d\'une seconde valeur', function (t) {
   })
 })
 
-test('Démarrage d\'un quatrième serveur d connecté à a', function (t) {
-  return networkTools.runNetwork(networkTools.parseTopology('a-d'), 7353, false)
+test('Démarrage d\'un quatrième serveur d', function (t) {
+  return networkTools.runNodes(['d'], 7353, false).then(() => {
+    t.pass('d écoute sur le port 7353')
+  })
+})
+
+test('Ajout de d comme voisin de a avec addPeer', function (t) {
+  return networkTools.connectNetwork(networkTools.parseTopology('a-d'), false).then(() => {
+    t.pass('addPeer a répondu sans erreur')
+  })
 })
 
 test('Vérification de l\'initialisation', function (t) {
@@ -103,8 +119,16 @@ test('Vérification de l\'initialisation', function (t) {
 })
 
 // Cette fois, c'est le nouveau noeud qui fait addPeer : il doit se synchroniser lui-même
-test('Démarrage d\'un cinquième serveur e qui ajoute a comme voisin', function (t) {
-  return networkTools.runNetwork(networkTools.parseTopology('e-a'), 7354, false)
+test('Démarrage d\'un cinquième serveur e', function (t) {
+  return networkTools.runNodes(['e'], 7354, false).then(() => {
+    t.pass('e écoute sur le port 7354')
+  })
+})
+
+test('Ajout de a comme voisin de e avec addPeer', function (t) {
+  return networkTools.connectNetwork(networkTools.parseTopology('e-a'), false).then(() => {
+    t.pass('addPeer a répondu sans erreur')
+  })
 })
 
 test('Vérification de l\'initialisation par addPeer', function (t) {

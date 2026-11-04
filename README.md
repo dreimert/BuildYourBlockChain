@@ -9,6 +9,8 @@ Les buts de cette étape sont :
 
 Vous pouvez lancer `npm test` à tout moment pour voir où vous en êtes. Les tests lancent cinq nœuds sur les ports 7350 à 7354 et vérifient la commande `peers`, le refus d'un voisin déjà connu, la propagation des valeurs et la synchronisation initiale.
 
+Au début de l'étape, **20 tests sur 29 échouent** : c'est normal. Les nœuds démarrent bien, mais ils ne savent pas encore répondre à `addPeer` ni à `peers`. Le premier échec à regarder est celui de `addPeer`.
+
 ## Confiance et défaillance (5 à 15 min)
 
 Dans l'approche par client / serveur, vous devez avoir confiance dans le serveur :
@@ -195,7 +197,7 @@ Grâce à cet outil, j'ai écrit le scénario de la synchronisation initiale. Il
 
 ## Vérifier que tout fonctionne (5 min)
 
-Lancez `npm test`.
+Lancez `npm test`. Les 29 tests doivent passer.
 
 ## Conclusion
 
