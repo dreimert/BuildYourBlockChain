@@ -129,16 +129,23 @@ export function parseTopology (topology) {
   })
 }
 
-export function runNetwork (topology, port = 7400, verbose = true, timeout = 15000) {
+// Lance les noeuds qui ne tournent pas encore, sur des ports consécutifs
+export function runNodes (ids, port = 7400, verbose = true) {
   // run est asynchrone : on calcule la liste des nouveaux noeuds avant de les lancer
-  const newIds = [...new Set(topology.flat())].filter((id) => !network[id])
-  const newNodes = newIds.map((id) => run(id, port++, verbose))
+  const newIds = [...new Set(ids)].filter((id) => !network[id])
 
-  return Promise.all(newNodes).then(() => {
-    return Promise.all(topology.map((connexion) => {
-      return setNeighbor(network[connexion[0]], network[connexion[1]], verbose, timeout)
-    }))
-  }).then(wait(1000, verbose)).then(network)
+  return Promise.all(newIds.map((id) => run(id, port++, verbose))).then(() => newIds)
+}
+
+// Relie les noeuds déjà lancés avec addPeer
+export function connectNetwork (topology, verbose = true, timeout = 5000) {
+  return Promise.all(topology.map((connexion) => {
+    return setNeighbor(network[connexion[0]], network[connexion[1]], verbose, timeout)
+  })).then(wait(1000, verbose)).then(() => network)
+}
+
+export function runNetwork (topology, port = 7400, verbose = true, timeout = 15000) {
+  return runNodes(topology.flat(), port, verbose).then(() => connectNetwork(topology, verbose, timeout))
 }
 
 export function setNeighbor (src, dst, verbose = true, timeout = 5000) {
@@ -153,20 +160,26 @@ export function setNeighbor (src, dst, verbose = true, timeout = 5000) {
     requestTimeout: 1000
   })
 
+  const commande = `addPeer ${dst.port} envoyé à ${src.id} (port ${src.port})`
+
   // On ferme la socket même en cas de timeout, sinon elle empêche le programme de se terminer
-  return promiseTimeout(`Ajout de ${dst.id}:${dst.port} comme voisin de ${src.id}:${src.port}`, timeout, new Promise((resolve, reject) => {
+  return promiseTimeout(commande, timeout, new Promise((resolve, reject) => {
     socket.on('connect', () => {
       socket.emit('addPeer', dst.port, (error) => {
         if (error) {
-          console.error('#! setNeighbor::addPeer:error:', error)
-          reject(error)
+          reject(new Error(`${commande} : le noeud a répondu par l'erreur "${error}"`))
         } else {
           resolve()
         }
         socket.close()
       })
     })
-  })).finally(() => socket.close())
+  })).catch((error) => {
+    if (error.message.startsWith(`${commande}: Timed out`)) {
+      throw new Error(`${commande} : pas de réponse en ${timeout} ms. La commande addPeer existe-t-elle dans serveur.js, et appelle-t-elle bien son callback ?`)
+    }
+    throw error
+  }).finally(() => socket.close())
 }
 
 export function auth (target, neighbor, verbose = true, timeout = 5000) {
@@ -211,6 +224,8 @@ export default {
   waitForPort,
   run,
   parseTopology,
+  runNodes,
+  connectNetwork,
   runNetwork,
   setNeighbor,
   auth,
